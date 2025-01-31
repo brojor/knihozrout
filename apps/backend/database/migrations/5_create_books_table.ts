@@ -17,6 +17,7 @@ export default class extends BaseSchema {
       table.integer('series_id').unsigned().references('id').inTable('series').nullable()
       table.integer('series_order').nullable()
       table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
+      table.integer('library_id').unsigned().references('id').inTable('libraries').nullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()

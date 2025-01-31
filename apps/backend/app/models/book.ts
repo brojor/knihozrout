@@ -48,6 +48,9 @@ export default class Book extends BaseModel {
   @column()
   declare userId: number
 
+  @column()
+  declare libraryId: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -66,8 +69,8 @@ export default class Book extends BaseModel {
   @manyToMany(() => Genre)
   declare genres: ManyToMany<typeof Genre>
 
-  @manyToMany(() => Library)
-  declare libraries: ManyToMany<typeof Library>
+  @belongsTo(() => Library)
+  declare library: BelongsTo<typeof Library>
 
   @manyToMany(() => ReadingChallenge, {
     pivotTable: 'book_reading_challenge',

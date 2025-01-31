@@ -16,13 +16,6 @@ export default class extends BaseSchema {
       table.primary(['book_id', 'genre_id'])
     })
 
-    // Vazba knih a knihoven
-    this.schema.createTable('book_library', (table) => {
-      table.integer('book_id').unsigned().references('id').inTable('books').notNullable()
-      table.integer('library_id').unsigned().references('id').inTable('libraries').notNullable()
-      table.primary(['book_id', 'library_id'])
-    })
-
     // Vazba knih a čtenářských výzev
     this.schema.createTable('book_reading_challenge', (table) => {
       table.integer('book_id').unsigned().references('id').inTable('books').notNullable()
@@ -38,10 +31,8 @@ export default class extends BaseSchema {
   }
 
   async down() {
-    this.schema.dropTable('book_reading_challenge')
-    this.schema.dropTable('book_library')
-    this.schema.dropTable('book_genre')
     this.schema.dropTable('author_book')
+    this.schema.dropTable('book_genre')
     this.schema.dropTable('book_reading_challenge')
   }
 }
