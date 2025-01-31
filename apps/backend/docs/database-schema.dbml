@@ -1,0 +1,149 @@
+Table users {
+  id integer [primary key]
+  full_name varchar
+  email varchar [unique]
+  password varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table books {
+  id integer [primary key]
+  title varchar [not null]
+  subtitle varchar
+  publication_year integer
+  cover_image varchar
+  page_count integer
+  language varchar(3)
+  isbn varchar
+  publisher varchar
+  series_id integer [ref: > series.id]
+  series_order integer
+  user_id integer [ref: > users.id, not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table authors {
+  id integer [primary key]
+  name varchar [not null]
+  birth_date date
+  death_date date
+  biography text
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table genres {
+  id integer [primary key]
+  name varchar [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table series {
+  id integer [primary key]
+  name varchar [not null]
+  description text
+  planned_books_count integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table libraries {
+  id integer [primary key]
+  name varchar [not null]
+  description text
+  user_id integer [ref: > users.id, not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table reading_states {
+  id integer [primary key]
+  book_id integer [ref: > books.id, not null]
+  user_id integer [ref: > users.id, not null]
+  status varchar [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table reading_sessions {
+  id integer [primary key]
+  book_id integer [ref: > books.id, not null]
+  user_id integer [ref: > users.id, not null]
+  started_at timestamp [not null]
+  finished_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table reading_progress {
+  id integer [primary key]
+  reading_session_id integer [ref: > reading_sessions.id, not null]
+  page integer [not null]
+  created_at timestamp [not null]
+
+  indexes {
+    (reading_session_id, created_at)
+  }
+}
+
+Table reading_challenges {
+  id integer [primary key]
+  name varchar [not null]
+  description text
+  user_id integer [ref: > users.id, not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table book_loans {
+  id integer [primary key]
+  book_id integer [ref: > books.id, not null]
+  user_id integer [ref: > users.id, not null]
+  borrower_name varchar [not null]
+  note text
+  borrowed_at timestamp [not null]
+  returned_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Vazební tabulky pro M:N vztahy
+Table author_book {
+  author_id integer [ref: > authors.id, not null]
+  book_id integer [ref: > books.id, not null]
+
+  indexes {
+    (author_id, book_id) [pk]
+  }
+}
+
+Table book_genre {
+  book_id integer [ref: > books.id, not null]
+  genre_id integer [ref: > genres.id, not null]
+
+  indexes {
+    (book_id, genre_id) [pk]
+  }
+}
+
+Table book_library {
+  book_id integer [ref: > books.id, not null]
+  library_id integer [ref: > libraries.id, not null]
+
+  indexes {
+    (book_id, library_id) [pk]
+  }
+}
+
+Table book_reading_challenge {
+  book_id integer [ref: > books.id, not null]
+  reading_challenge_id integer [ref: > reading_challenges.id, not null]
+  completed boolean [default: false]
+
+  indexes {
+    (book_id, reading_challenge_id) [pk]
+  }
+}
