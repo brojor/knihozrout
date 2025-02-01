@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Book from '#models/book'
-import User from '#models/user'
 
 export enum ReadingStatus {
   UNREAD = 'unread',
@@ -22,9 +21,6 @@ export default class ReadingState extends BaseModel {
   declare bookId: number
 
   @column()
-  declare userId: number
-
-  @column()
   declare status: ReadingStatus
 
   @column.dateTime({ autoCreate: true })
@@ -35,7 +31,4 @@ export default class ReadingState extends BaseModel {
 
   @belongsTo(() => Book)
   declare book: BelongsTo<typeof Book>
-
-  @belongsTo(() => User)
-  declare user: BelongsTo<typeof User>
 }
