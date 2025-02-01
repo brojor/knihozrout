@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany, computed } from '@adonisjs/lucid/orm'
 import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import Book from '#models/book'
 
@@ -8,7 +8,13 @@ export default class Author extends BaseModel {
   declare id: number
 
   @column()
-  declare name: string
+  declare firstName: string
+
+  @column()
+  declare lastName: string
+
+  @column()
+  declare photoUrl: string | null
 
   @column.date()
   declare birthDate: DateTime | null
@@ -27,4 +33,22 @@ export default class Author extends BaseModel {
 
   @manyToMany(() => Book)
   declare books: ManyToMany<typeof Book>
+
+  @computed()
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`
+  }
+
+  @computed()
+  get sortableName() {
+    return `${this.lastName}, ${this.firstName}`
+  }
+
+  /**
+   * Vrátí jméno autora v požadovaném formátu
+   * @param format 'natural' pro běžné zobrazení, 'sortable' pro řazení podle příjmení
+   */
+  getFormattedName(format: 'natural' | 'sortable' = 'natural'): string {
+    return format === 'natural' ? this.fullName : this.sortableName
+  }
 }

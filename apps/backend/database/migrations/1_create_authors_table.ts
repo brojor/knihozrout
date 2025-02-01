@@ -6,13 +6,18 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('name').notNullable()
+      table.string('first_name').notNullable()
+      table.string('last_name').notNullable()
+      table.string('photo_url').nullable()
       table.date('birth_date').nullable()
       table.date('death_date').nullable()
       table.text('biography').nullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
+
+      // Index pro vyhledávání podle jména
+      table.index(['last_name', 'first_name'])
     })
   }
 
