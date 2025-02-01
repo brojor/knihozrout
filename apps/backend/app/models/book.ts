@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, manyToMany, hasMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, ManyToMany, HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, belongsTo, manyToMany, hasMany, hasOne } from '@adonisjs/lucid/orm'
+import type { BelongsTo, ManyToMany, HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import User from '#models/user'
 import Author from '#models/author'
 import Genre from '#models/genre'
@@ -86,4 +86,7 @@ export default class Book extends BaseModel {
 
   @hasMany(() => BookLoan)
   declare loans: HasMany<typeof BookLoan>
+
+  @hasOne(() => ReadingState)
+  declare readingState: HasOne<typeof ReadingState>
 }
