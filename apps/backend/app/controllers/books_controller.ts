@@ -3,7 +3,12 @@ import Book from '#models/book'
 import Author from '#models/author'
 import Genre from '#models/genre'
 import Library from '#models/library'
-import { createBookValidator } from '#validators/book'
+import {
+  createBookValidator,
+  paginationValidator,
+  sortValidator,
+  filterValidator,
+} from '#validators/book'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 
 interface QueryFilters {
@@ -184,18 +189,9 @@ export default class BooksController {
    * Zobrazí seznam knih v tabulce s detaily
    */
   async list({ request, auth }: HttpContext) {
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 20)
-    const filters = request.only([
-      'language',
-      'libraryId',
-      'authorId',
-      'genreId',
-      'readingStatus',
-      'series',
-    ])
-    const sort = request.input('sort', 'title')
-    const direction = request.input('direction', 'asc')
+    const { page = 1, limit = 20 } = await request.validateUsing(paginationValidator)
+    const { sort = 'title', direction = 'asc' } = await request.validateUsing(sortValidator)
+    const filters = await request.validateUsing(filterValidator)
 
     let query = Book.query()
       .where('userId', auth.user!.id)
@@ -225,18 +221,9 @@ export default class BooksController {
    * Zobrazí seznam knih v mřížce (pouze ID a obrázek přebalu)
    */
   async grid({ request, auth }: HttpContext) {
-    const page = request.input('page', 1)
-    const limit = request.input('limit', 24)
-    const filters = request.only([
-      'language',
-      'libraryId',
-      'authorId',
-      'genreId',
-      'readingStatus',
-      'series',
-    ])
-    const sort = request.input('sort', 'title')
-    const direction = request.input('direction', 'asc')
+    const { page = 1, limit = 24 } = await request.validateUsing(paginationValidator)
+    const { sort = 'title', direction = 'asc' } = await request.validateUsing(sortValidator)
+    const filters = await request.validateUsing(filterValidator)
 
     let query = Book.query()
       .where('userId', auth.user!.id)

@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { ReadingStatus } from '#models/reading_state'
 
 /**
  * Validátor pro vytvoření knihy
@@ -25,5 +26,41 @@ export const createBookValidator = vine.compile(
       )
       .minLength(1),
     genres: vine.array(vine.string().trim()).minLength(1),
+  })
+)
+
+/**
+ * Validátor pro stránkování
+ */
+export const paginationValidator = vine.compile(
+  vine.object({
+    page: vine.number().positive().optional(),
+    limit: vine.number().positive().optional(),
+  })
+)
+
+/**
+ * Validátor pro řazení
+ */
+export const sortValidator = vine.compile(
+  vine.object({
+    sort: vine
+      .enum(['title', 'authorLastName', 'authorFirstName', 'publicationYear', 'pageCount'] as const)
+      .optional(),
+    direction: vine.enum(['asc', 'desc'] as const).optional(),
+  })
+)
+
+/**
+ * Validátor pro filtrování
+ */
+export const filterValidator = vine.compile(
+  vine.object({
+    language: vine.string().trim().minLength(3).maxLength(3).optional(),
+    libraryId: vine.number().positive().optional(),
+    authorId: vine.number().positive().optional(),
+    genreId: vine.number().positive().optional(),
+    readingStatus: vine.enum(Object.values(ReadingStatus)).optional(),
+    series: vine.number().positive().optional(),
   })
 )
