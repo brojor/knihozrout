@@ -23,3 +23,5 @@ router
     router.post('/logout', '#controllers/auth_controller.logout').use(middleware.auth())
   })
   .prefix('/auth')
+
+router.get('/test-scraper', '#controllers/test_controller.testScraper')

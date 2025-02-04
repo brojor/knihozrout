@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "@knihozrout/backend",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -61,7 +61,8 @@
     "@vinejs/vine": "^3.0.0",
     "luxon": "^3.5.0",
     "pg": "^8.13.1",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "@knihozrout/scraper": "workspace:*"
   },
   "hotHook": {
     "boundaries": [

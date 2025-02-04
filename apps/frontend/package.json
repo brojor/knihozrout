@@ -1,6 +1,7 @@
 {
-  "name": "nuxt-app",
+  "name": "@knihozrout/frontend",
   "type": "module",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "build": "nuxt build",
