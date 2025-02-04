@@ -1,5 +1,6 @@
 import vine from '@vinejs/vine'
 import { ReadingStatus } from '#models/reading_state'
+import { SUPPORTED_LANGUAGES } from '#constants/languages'
 
 /**
  * Validátor pro vytvoření knihy
@@ -11,7 +12,11 @@ export const createBookValidator = vine.compile(
     publicationYear: vine.number().positive().nullable(),
     coverImage: vine.string().trim().url().nullable(),
     pageCount: vine.number().positive().nullable(),
-    language: vine.string().trim().minLength(3).maxLength(3).nullable(),
+    language: vine
+      .string()
+      .trim()
+      .in([...SUPPORTED_LANGUAGES])
+      .transform((value) => value.toLowerCase()),
     isbn: vine.string().trim().nullable(),
     publisher: vine.string().trim().nullable(),
     seriesId: vine.number().positive().nullable(),

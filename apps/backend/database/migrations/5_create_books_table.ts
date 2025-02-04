@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.integer('publication_year').nullable()
       table.string('cover_image').nullable()
       table.integer('page_count').nullable()
-      table.string('language', 3).nullable()
+      table.string('language', 2).notNullable()
       table.string('isbn').nullable()
       table.string('publisher').nullable()
       table.integer('series_id').unsigned().references('id').inTable('series').nullable()
