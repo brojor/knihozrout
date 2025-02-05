@@ -27,9 +27,12 @@ export class KnihyDobrovskyProvider extends BaseProvider {
 
         return {
             title: this.extractTitle($),
+            originalTitle: this.extractOriginalTitle($),
             subtitle: this.extractSubtitle($),
+            description: this.extractDescription($),
             authors: this.extractAuthors($),
             language: this.extractLanguage($),
+            originalLanguage: this.extractOriginalLanguage($),
             pageCount: this.extractPageCount($),
             publisher: this.extractPublisher($),
             publicationYear: this.extractPublicationYear($),
@@ -87,5 +90,24 @@ export class KnihyDobrovskyProvider extends BaseProvider {
 
     private extractCoverImage($: cheerio.CheerioAPI): string | undefined {
         return $('.img-big a').attr('data-src')
+    }
+
+    private extractOriginalTitle($: cheerio.CheerioAPI): string | undefined {
+        return $('.box-book-info dt')
+            .filter((_, el) => $(el).text().trim().toLowerCase() === 'původní název')
+            .next('dd').text().trim() || undefined
+    }
+
+    private extractOriginalLanguage($: cheerio.CheerioAPI): LanguageCode | undefined {
+        const language = $('.box-book-info dt')
+            .filter((_, el) => $(el).text().trim().toLowerCase() === 'původní jazyk')
+            .next('dd').text().trim().toLowerCase()
+
+        return this.languageMap[language]
+    }
+
+    private extractDescription($: cheerio.CheerioAPI): string | undefined {
+        const description = $('.box-annot p:not(.box-share)').map((_, el) => $(el).text().trim()).get().join('\n').trim()
+        return description ? description : undefined
     }
 } 

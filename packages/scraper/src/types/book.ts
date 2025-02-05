@@ -7,12 +7,15 @@ export interface ScrapedAuthor {
 
 export interface ScrapedBook {
   title: string
+  originalTitle?: string
   subtitle?: string
+  description?: string
   authors: ScrapedAuthor[]
   publicationYear?: number
   coverImage?: string
   pageCount?: number
   language?: LanguageCode
+  originalLanguage?: LanguageCode
   ean?: number
   publisher?: string
 }

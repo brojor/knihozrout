@@ -51,6 +51,15 @@ export default class Book extends BaseModel {
   @column()
   declare libraryId: number | null
 
+  @column()
+  declare originalTitle: string | null
+
+  @column()
+  declare originalLanguage: string | null
+
+  @column()
+  declare description: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
