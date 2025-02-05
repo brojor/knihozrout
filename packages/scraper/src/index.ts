@@ -19,8 +19,8 @@ export class BookScraper {
 
   async searchByEan(ean: number): Promise<SearchResult[]> {
     const supportedDomains = this.providers.map(p => p.domain)
-    const query = `${ean} site:${supportedDomains.join(' OR site:')}`   
-   
+    // const query = `${ean} site:${supportedDomains.join(' OR site:')}`   
+    const query = `${ean}`
     const response = await fetch(
       `https://www.googleapis.com/customsearch/v1?key=${this.apiKey}&cx=${this.searchEngineId}&q=${encodeURIComponent(query)}`
     )
@@ -68,18 +68,9 @@ export class BookScraper {
       const provider = this.providers.find(p => p.domain === result.domain)!
       const bookData = await provider.scrape(result.url)
       
-      // Sloučíme data, přičemž zachováme existující hodnoty
       mergedBook = {
         ...bookData,
-        ...mergedBook,
-        authors: [...new Set([
-          ...(mergedBook.authors || []),
-          ...(bookData.authors || [])
-        ])].filter((author): author is ScrapedAuthor => 
-          !!author.firstName && !!author.lastName
-        ),
-        subtitle: mergedBook.subtitle || bookData.subtitle,
-        coverImage: mergedBook.coverImage || bookData.coverImage
+        ...mergedBook
       }
     }
 
