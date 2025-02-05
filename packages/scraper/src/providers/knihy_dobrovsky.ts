@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio'
 import { BaseProvider } from './base_provider'
-import { LanguageCode, PartialScrapedBook } from '../types/book'
+import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book'
 
 export class KnihyDobrovskyProvider extends BaseProvider {
     readonly domain = 'knihydobrovsky.cz'
@@ -48,12 +48,16 @@ export class KnihyDobrovskyProvider extends BaseProvider {
         return $('h1 > span[itemprop="name"]').text().trim().split(' - ')[1]
     }
 
-    private extractAuthors($: cheerio.CheerioAPI) {
-        return $('.annot p.author a').map((_, el) => {
+    private extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
+        const authors = $('.annot p.author a').map((_, el) => {
             const fullName = $(el).text().trim()
-            const [firstName, lastName] = fullName.split(' ').map(s => s.trim())
+            const nameParts = fullName.split(' ')
+            const lastName = nameParts.pop() || ''
+            const firstName = nameParts.join(' ')
             return { firstName, lastName }
         }).get()
+        
+        return authors.length > 0 ? authors : undefined
     }
 
     private extractLanguage($: cheerio.CheerioAPI) {

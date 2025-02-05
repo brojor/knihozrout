@@ -58,15 +58,21 @@ export class KnizniKlubProvider extends BaseProvider {
     }
 
     private extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
-        const authors = $('.title-header__author__content').first().text().trim()
-        if (!authors) {
+        const authorText = $('.title-header__author__content').first().text().trim()
+        if (!authorText) {
             return undefined
         }
-        return authors.split(',').filter(author => author.trim() !== '')
-            .map(author => author.trim()).map(author => {
-                const [firstName, lastName] = author.split(' ')
+        
+        const authors = authorText.split(',')
+            .filter(author => author.trim() !== '')
+            .map(author => {
+                const nameParts = author.trim().split(' ')
+                const lastName = nameParts.pop() || ''
+                const firstName = nameParts.join(' ')
                 return { firstName, lastName }
             })
+        
+        return authors.length > 0 ? authors : undefined
     }
 
     private extractLanguage($: cheerio.CheerioAPI): LanguageCode | undefined {
