@@ -15,10 +15,10 @@ export class BookScraper {
     ]
   }
 
-  async searchByIsbn(isbn: string): Promise<SearchResult[]> {
+  async searchByEan(ean: number): Promise<SearchResult[]> {
     const supportedDomains = this.providers.map(p => p.domain)
-    const query = `${isbn} site:${supportedDomains.join(' OR site:')}`
-    
+    const query = `${ean} site:${supportedDomains.join(' OR site:')}`   
+   
     const response = await fetch(
       `https://www.googleapis.com/customsearch/v1?key=${this.apiKey}&cx=${this.searchEngineId}&q=${encodeURIComponent(query)}`
     )
@@ -53,14 +53,14 @@ export class BookScraper {
       .filter((result: SearchResult | null): result is SearchResult => result !== null)
   }
 
-  async scrapeBookDetails(isbn: string): Promise<ScrapedBook> {
-    const searchResults = await this.searchByIsbn(isbn)
+  async scrapeBookDetails(ean: number): Promise<ScrapedBook> {
+    const searchResults = await this.searchByEan(ean)
     
     if (searchResults.length === 0) {
       throw new Error('Kniha nebyla nalezena v žádném z podporovaných zdrojů')
     }
 
-    let mergedBook: Partial<ScrapedBook> = {}
+    let mergedBook: Partial<ScrapedBook> = { ean }
 
     for (const result of searchResults) {
       const provider = this.providers.find(p => p.domain === result.domain)!

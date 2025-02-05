@@ -17,7 +17,7 @@ export const createBookValidator = vine.compile(
       .trim()
       .in([...SUPPORTED_LANGUAGES])
       .transform((value) => value.toLowerCase()),
-    isbn: vine.string().trim().nullable(),
+    ean: vine.number().positive().nullable(),
     publisher: vine.string().trim().nullable(),
     seriesId: vine.number().positive().nullable(),
     seriesOrder: vine.number().positive().nullable(),

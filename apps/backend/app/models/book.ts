@@ -34,7 +34,7 @@ export default class Book extends BaseModel {
   declare language: string
 
   @column()
-  declare isbn: string | null
+  declare ean: number | null
 
   @column()
   declare publisher: string | null

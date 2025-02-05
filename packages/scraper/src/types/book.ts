@@ -13,7 +13,7 @@ export interface ScrapedBook {
   coverImage?: string
   pageCount?: number
   language?: LanguageCode
-  isbn?: string
+  ean?: number
   publisher?: string
 }
 

@@ -31,7 +31,6 @@ export class KnihyDobrovskyProvider extends BaseProvider {
             authors: this.extractAuthors($),
             language: this.extractLanguage($),
             pageCount: this.extractPageCount($),
-            isbn: this.extractIsbn($),
             publisher: this.extractPublisher($),
             publicationYear: this.extractPublicationYear($),
             coverImage: this.extractCoverImage($)
@@ -68,14 +67,6 @@ export class KnihyDobrovskyProvider extends BaseProvider {
             .next('dd').text().trim()
 
         return pageCount ? parseInt(pageCount) : undefined
-    }
-
-    private extractIsbn($: cheerio.CheerioAPI): string | undefined {
-        const isbn = $('.box-book-info dt')
-            .filter((_, el) => $(el).text().trim().toLowerCase() === 'isbn')
-            .next('dd').text().trim()
-
-        return isbn ? isbn : undefined
     }
 
     private extractPublisher($: cheerio.CheerioAPI): string | undefined {

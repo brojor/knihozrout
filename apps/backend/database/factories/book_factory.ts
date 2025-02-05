@@ -15,7 +15,7 @@ export const BookFactory = factory
       coverImage: faker.helpers.maybe(() => faker.image.url()),
       pageCount: faker.number.int({ min: 50, max: 1000 }),
       language: faker.helpers.arrayElement(SUPPORTED_LANGUAGES),
-      isbn: faker.helpers.maybe(() => faker.string.numeric(13)),
+      ean: faker.helpers.maybe(() => Number.parseInt(faker.string.numeric(13))),
       publisher: faker.company.name(),
     }
   })

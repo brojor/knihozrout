@@ -12,7 +12,7 @@ export default class extends BaseSchema {
       table.string('cover_image').nullable()
       table.integer('page_count').nullable()
       table.string('language', 2).notNullable()
-      table.string('isbn').nullable()
+      table.bigInteger('ean').nullable()
       table.string('publisher').nullable()
       table.integer('series_id').unsigned().references('id').inTable('series').nullable()
       table.integer('series_order').nullable()
