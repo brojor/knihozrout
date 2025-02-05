@@ -1,4 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
+import BookScraper from '@knihozrout/scraper'
+import env from '#start/env'
 import Book from '#models/book'
 import Author from '#models/author'
 import Genre from '#models/genre'
@@ -8,6 +10,7 @@ import {
   paginationValidator,
   sortValidator,
   filterValidator,
+  scrapedBookValidator,
 } from '#validators/book'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 
@@ -183,6 +186,68 @@ export default class BooksController {
     })
 
     return response.created(book)
+  }
+
+  /**
+   * Vytvoří novou knihu pomocí EAN kódu
+   */
+  async storeFromEan({ request, auth, response }: HttpContext) {
+    const ean = request.input('ean')
+    const libraryId = request.input('libraryId')
+
+    if (!ean) {
+      return response.badRequest({ error: 'EAN kód je povinný' })
+    }
+
+    // Najdeme knihovnu - buď specifikovanou nebo výchozí
+    const targetLibraryId =
+      libraryId ||
+      (await Library.query()
+        .where('userId', auth.user!.id)
+        .orderBy('createdAt', 'asc')
+        .firstOrFail()
+        .then((library) => library.id))
+
+    const scraper = new BookScraper(env.get('GOOGLE_API_KEY'), env.get('GOOGLE_SEARCH_ENGINE_ID'))
+
+    try {
+      const scrapedData = await scraper.scrapeBookDetails(ean)
+      if (!scrapedData) {
+        return response.notFound({ error: 'Kniha nebyla nalezena' })
+      }
+
+      // Vytvoření nebo nalezení autorů
+      const authorIds = []
+      for (const authorData of scrapedData.authors || []) {
+        const author = await Author.updateOrCreate(
+          { firstName: authorData.firstName, lastName: authorData.lastName },
+          authorData
+        )
+        authorIds.push(author.id)
+      }
+
+      // Příprava dat pro knihu
+      const bookData = {
+        ...scrapedData,
+        ean: Number(ean),
+        userId: auth.user!.id,
+        libraryId: targetLibraryId,
+      }
+
+      // Validace dat
+      const validatedData = await scrapedBookValidator.validate(bookData)
+
+      // Vytvoření knihy včetně vztahů
+      const book = await Book.create(validatedData)
+      await book.related('authors').attach(authorIds)
+      await book.load('authors')
+
+      return response.created(book)
+    } catch (error) {
+      return response.badRequest({
+        error: error instanceof Error ? error.message : 'Neznámá chyba při získávání dat knihy',
+      })
+    }
   }
 
   /**

@@ -16,6 +16,7 @@ router.get('/', async () => {
   }
 })
 
+// Autentizační endpointy
 router
   .group(() => {
     router.post('/register', '#controllers/auth_controller.register')
@@ -24,4 +25,10 @@ router
   })
   .prefix('/auth')
 
-router.get('/test-scraper', '#controllers/test_controller.testScraper')
+// API endpointy
+router
+  .group(() => {
+    router.post('/books/from-ean', '#controllers/books_controller.storeFromEan')
+  })
+  .prefix('/api')
+  .use(middleware.auth())

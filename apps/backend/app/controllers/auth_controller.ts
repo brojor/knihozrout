@@ -1,5 +1,6 @@
 import { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
+import Library from '#models/library'
 import { registerValidator, loginValidator } from '#validators/auth'
 
 export default class AuthController {
@@ -14,6 +15,12 @@ export default class AuthController {
 
     // Vytvoření uživatele
     const user = await User.create(data)
+
+    // Vytvoření výchozí knihovny pro uživatele
+    await Library.create({
+      name: 'Moje knihovna',
+      userId: user.id,
+    })
 
     // Generování tokenu
     const token = await User.accessTokens.create(user, ['*'])
