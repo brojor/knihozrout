@@ -16,7 +16,6 @@ export interface ScrapedBook {
   pageCount?: number
   language?: LanguageCode
   originalLanguage?: LanguageCode
-  ean?: number
   publisher?: string
 }
 
