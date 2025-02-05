@@ -1,5 +1,6 @@
 import { ScrapedAuthor, ScrapedBook, SearchResult } from './types/book'
 import { KnihyDobrovskyProvider } from './providers/knihy_dobrovsky'
+import { KnizniKlubProvider } from './providers/knizni_klub'
 import { BaseProvider } from './providers/base_provider'
 
 export class BookScraper {
@@ -11,7 +12,8 @@ export class BookScraper {
     this.apiKey = apiKey
     this.searchEngineId = searchEngineId
     this.providers = [
-      new KnihyDobrovskyProvider()
+      new KnihyDobrovskyProvider(),
+      new KnizniKlubProvider(),
     ]
   }
 
