@@ -8,15 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.integer('book_id').unsigned().references('id').inTable('books').notNullable()
       table
-        .enum('status', [
-          'unread',
-          'reading',
-          'read',
-          'paused',
-          'want_to_read',
-          'wishlist',
-          'not_owned',
-        ])
+        .enum('status', ['unread', 'reading', 'read', 'paused', 'want_to_read', 'wishlist'])
         .notNullable()
 
       table.timestamp('created_at').notNullable()

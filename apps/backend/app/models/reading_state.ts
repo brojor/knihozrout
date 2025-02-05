@@ -10,7 +10,6 @@ export enum ReadingStatus {
   PAUSED = 'paused',
   WANT_TO_READ = 'want_to_read',
   WISHLIST = 'wishlist',
-  NOT_OWNED = 'not_owned',
 }
 
 export default class ReadingState extends BaseModel {
