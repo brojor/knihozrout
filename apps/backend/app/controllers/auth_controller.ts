@@ -29,15 +29,16 @@ export default class AuthController {
   }
 
   async login({ request, response }: HttpContext) {
-    const { email, password } = await request.validateUsing(loginValidator)
-
-    // Ověření přihlašovacích údajů
-    const user = await User.verifyCredentials(email, password)
-
-    // Generování tokenu
-    const token = await User.accessTokens.create(user, ['*'])
-
-    return response.ok({ user, token })
+    try {
+      const { email, password } = await request.validateUsing(loginValidator)
+      const user = await User.verifyCredentials(email, password)
+      const token = await User.accessTokens.create(user, ['*'])
+      return response.ok({ user, token })
+    } catch (error) {
+      return response.unauthorized({
+        message: 'Nesprávný email nebo heslo',
+      })
+    }
   }
 
   async logout({ auth, response }: HttpContext) {
