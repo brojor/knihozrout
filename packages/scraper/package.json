@@ -5,8 +5,14 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "test": "tsx src/test.ts"
@@ -18,4 +24,4 @@
     "@types/jsdom": "^21.1.6",
     "tsx": "^4.7.0"
   }
-} 
+}

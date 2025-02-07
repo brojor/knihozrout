@@ -1,7 +1,7 @@
-import { ScrapedAuthor, ScrapedBook, SearchResult } from './types/book'
-import { KnihyDobrovskyProvider } from './providers/knihy_dobrovsky'
-import { KnizniKlubProvider } from './providers/knizni_klub'
-import { BaseProvider } from './providers/base_provider'
+import { ScrapedAuthor, ScrapedBook, SearchResult } from './types/book.js'
+import { KnihyDobrovskyProvider } from './providers/knihy_dobrovsky.js'
+import { KnizniKlubProvider } from './providers/knizni_klub.js'
+import { BaseProvider } from './providers/base_provider.js'
 
 export class BookScraper {
   private readonly providers: BaseProvider[]

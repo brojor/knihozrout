@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio'
-import { BaseProvider } from './base_provider'
-import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book'
+import { BaseProvider } from './base_provider.js'
+import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
 
 export class KnizniKlubProvider extends BaseProvider {
     readonly domain = 'knizniklub.cz'
