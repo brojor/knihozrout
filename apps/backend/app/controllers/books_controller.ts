@@ -13,6 +13,8 @@ import {
   scrapedBookValidator,
 } from '#validators/book'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import SearchResult from '#models/search_result'
+import type { SearchResultItem } from '@knihozrout/scraper'
 
 interface QueryFilters {
   language?: string
@@ -211,14 +213,18 @@ export default class BooksController {
     const scraper = new BookScraper(env.get('GOOGLE_API_KEY'), env.get('GOOGLE_SEARCH_ENGINE_ID'))
 
     try {
-      const scrapedData = await scraper.scrapeBookDetails(ean)
-      if (!scrapedData) {
-        return response.notFound({ error: 'Kniha nebyla nalezena' })
+      const { searchResults, scrapedBook } = await scraper.searchAndScrapeBook(ean)
+
+      // Vždy uložíme výsledky vyhledávání
+      await this.saveSearchResults(ean, searchResults)
+
+      if (!scrapedBook) {
+        return response.notFound({ error: 'Kniha nebyla nalezena v žádném z podporovaných zdrojů' })
       }
 
       // Vytvoření nebo nalezení autorů
       const authorIds = []
-      for (const authorData of scrapedData.authors || []) {
+      for (const authorData of scrapedBook.authors || []) {
         const author = await Author.updateOrCreate(
           { firstName: authorData.firstName, lastName: authorData.lastName },
           authorData
@@ -228,7 +234,7 @@ export default class BooksController {
 
       // Příprava dat pro knihu
       const bookData = {
-        ...scrapedData,
+        ...scrapedBook,
         ean: Number(ean),
         userId: auth.user!.id,
         libraryId: targetLibraryId,
@@ -248,6 +254,18 @@ export default class BooksController {
         error: error instanceof Error ? error.message : 'Neznámá chyba při získávání dat knihy',
       })
     }
+  }
+
+  private async saveSearchResults(ean: number, results: SearchResultItem[]) {
+    await SearchResult.createMany(
+      results.map(result => ({
+        ean,
+        domain: result.domain,
+        position: result.position,
+        url: result.url,
+        isSupported: result.isSupported
+      }))
+    )
   }
 
   /**
