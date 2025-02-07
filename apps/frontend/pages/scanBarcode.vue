@@ -6,34 +6,45 @@ const { $customFetch } = useNuxtApp()
 const scanResult = ref<string | null>(null)
 const book = ref<any | null>(null)
 const isLoading = ref(false)
-async function startScanning() {
-  const { ScanResult } = await CapacitorBarcodeScanner.scanBarcode({
-    hint: CapacitorBarcodeScannerTypeHint.EAN_13,
-    scanInstructions: 'Naskenujte čárový kód knihy',
-  })
 
-  scanResult.value = ScanResult
+async function startScanning() {
+  try {
+    const { ScanResult } = await CapacitorBarcodeScanner.scanBarcode({
+      hint: CapacitorBarcodeScannerTypeHint.EAN_13,
+      scanInstructions: 'Naskenujte čárový kód knihy',
+    })
+    scanResult.value = ScanResult
+  }
+  catch (error) {
+    console.error('Chyba při skenování:', error)
+  }
 }
 
-async function fetchBook() {
+async function fetchBookByEAN() {
   isLoading.value = true
-
-  // make post request to api/books/from-ean
-  const response = await $customFetch('/api/books/from-ean', {
-    method: 'POST',
-    body: {
-      ean: scanResult.value,
-    },
-  })
-
-  isLoading.value = false
-  console.log(response)
-  book.value = response.data
+  try {
+    const response = await $customFetch('/api/books/from-ean', {
+      method: 'POST',
+      body: { ean: scanResult.value },
+    })
+    if (response.data) {
+      book.value = response.data
+    }
+    else {
+      console.error('Žádná data nebyla vrácena')
+    }
+  }
+  catch (error) {
+    console.error('Chyba při načítání knihy:', error)
+  }
+  finally {
+    isLoading.value = false
+  }
 }
 
 watch(scanResult, (newVal) => {
   if (newVal) {
-    fetchBook()
+    fetchBookByEAN()
   }
 })
 
