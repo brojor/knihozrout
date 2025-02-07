@@ -16,7 +16,7 @@ export class KnihyDobrovskyProvider extends BaseProvider {
         'italština': 'it'
     }
 
-    async scrape(url: string): Promise<PartialScrapedBook> {
+    async scrapeBookDetails(url: string): Promise<PartialScrapedBook> {
         const response = await fetch(url)
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.status}`)

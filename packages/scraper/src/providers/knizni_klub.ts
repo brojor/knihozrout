@@ -16,7 +16,7 @@ export class KnizniKlubProvider extends BaseProvider {
         'italsky': 'it',
     }
 
-    async scrape(url: string): Promise<PartialScrapedBook> {
+    async scrapeBookDetails(url: string): Promise<PartialScrapedBook> {
         const response = await fetch(url)
         const html = await response.text()
         const $ = cheerio.load(html)

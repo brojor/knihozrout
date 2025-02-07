@@ -7,7 +7,7 @@ async function test() {
 
   try {
     console.log('Stahuji data z:', url)
-    const bookDetails = await provider.scrape(url)
+    const bookDetails = await provider.scrapeBookDetails(url)
     console.log('Detaily knihy:', JSON.stringify(bookDetails, null, 2))
   } catch (error) {
     console.error('Chyba:', error)

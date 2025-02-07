@@ -8,5 +8,5 @@ export abstract class BaseProvider {
    * @param url URL stránky s knihou
    * @returns Částečná data o knize - provider nemusí být schopen získat všechna data
    */
-  abstract scrape(url: string): Promise<PartialScrapedBook>
+  abstract scrapeBookDetails(url: string): Promise<PartialScrapedBook>
 } 

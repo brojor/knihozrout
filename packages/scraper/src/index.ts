@@ -1,7 +1,8 @@
-import { ScrapedAuthor, ScrapedBook, SearchResult } from './types/book.js'
+import { ScrapedBook } from './types/book.js'
 import { KnihyDobrovskyProvider } from './providers/knihy_dobrovsky.js'
 import { KnizniKlubProvider } from './providers/knizni_klub.js'
 import { BaseProvider } from './providers/base_provider.js'
+import { BookValidator } from './validators/book.validator.js'
 
 interface SearchResultItem {
   url: string
@@ -21,63 +22,6 @@ export class BookScraper {
       new KnihyDobrovskyProvider(),
       new KnizniKlubProvider()
     ]
-  }
-
-  // async scrapeBookDetails(ean: number): Promise<ScrapedBook> {
-  //   const searchResults = await this.searchByEan(ean)
-    
-  //   if (searchResults.length === 0) {
-  //     throw new Error('Kniha nebyla nalezena v žádném z podporovaných zdrojů')
-  //   }
-
-  //   let mergedBook: Partial<ScrapedBook> = {}
-
-  //   for (const result of searchResults) {
-  //     const provider = this.providers.find(p => p.domain === result.domain)!
-  //     const bookData = await provider.scrape(result.url)
-      
-  //     mergedBook = {
-  //       ...bookData,
-  //       ...mergedBook
-  //     }
-
-  //     if (this.isCompleteBook(mergedBook)) {
-  //       break; // Máme všechna data, můžeme skončit
-  //     }
-  //   }
-
-  //   if (!this.isValidScrapedBook(mergedBook)) {
-  //     throw new Error('Nepodařilo se získat všechna povinná data o knize')
-  //   }
-
-  //   return mergedBook as ScrapedBook
-  // }
-
-  private isValidScrapedBook(book: Partial<ScrapedBook>): book is ScrapedBook {
-    return !!(
-      book.title &&
-      book.authors &&
-      book.authors.length > 0 &&
-      book.authors.every(author => author.firstName && author.lastName)
-    )
-  }
-
-  private isCompleteBook(book: Partial<ScrapedBook>): boolean {
-    const requiredFields: (keyof ScrapedBook)[] = [
-      'title',
-      'originalTitle',
-      'subtitle',
-      'description',
-      'authors',
-      'publicationYear',
-      'coverImage',
-      'pageCount',
-      'language',
-      'originalLanguage',
-      'publisher'
-    ];
-
-    return requiredFields.every(field => book[field] !== undefined);
   }
 
   private async searchByEan(ean: number): Promise<SearchResultItem[]> {
@@ -141,23 +85,23 @@ export class BookScraper {
 
     for (const result of results) {
       const provider = this.providers.find(p => p.domain === result.domain)!
-      const bookData = await provider.scrape(result.url)
+      const bookData = await provider.scrapeBookDetails(result.url)
       
       mergedBook = {
         ...bookData,
         ...mergedBook
       }
 
-      if (this.isCompleteBook(mergedBook)) {
+      if (BookValidator.isComplete(mergedBook)) {
         break;
       }
     }
 
-    if (!this.isValidScrapedBook(mergedBook)) {
+    if (!BookValidator.isValid(mergedBook)) {
       throw new Error('Nepodařilo se získat všechna povinná data o knize')
     }
 
-    return mergedBook as ScrapedBook
+    return mergedBook
   }
 }
 
