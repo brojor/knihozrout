@@ -23,6 +23,9 @@ async function handleLogout() {
     <button class="logout-btn" @click="handleLogout">
       Odhlásit se
     </button>
+    <button @click="router.push('/scanBarcode')">
+      Skenovat knihu
+    </button>
   </div>
 </template>
 

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@capacitor/android": "^7.0.1",
+    "@capacitor/barcode-scanner": "^2.0.0",
     "@capacitor/core": "^7.0.1",
     "nuxt": "^3.15.4",
     "vue": "latest",

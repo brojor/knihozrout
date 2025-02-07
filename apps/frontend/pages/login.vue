@@ -15,7 +15,7 @@ async function handleSubmit() {
   try {
     error.value = ''
     const endpoint = isLogin.value ? '/auth/login' : '/auth/register'
-    const response = await $customFetch<{ token: { token: string } }>(endpoint, {
+    const response = await $customFetch(endpoint, {
       method: 'POST',
       body: {
         ...form,
