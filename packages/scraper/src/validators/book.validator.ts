@@ -6,6 +6,7 @@ export class BookValidator {
    */
   static isValid(book: PartialScrapedBook): book is ScrapedBook {
     return this.hasValidTitle(book) && 
+           this.hasValidLanguage(book) &&
            this.hasValidAuthors(book)
   }
 
@@ -26,6 +27,10 @@ export class BookValidator {
 
   private static hasValidTitle(book: PartialScrapedBook): boolean {
     return typeof book.title === 'string' && book.title.trim().length > 0
+  }
+
+  private static hasValidLanguage(book: PartialScrapedBook): boolean {
+    return typeof book.language === 'string' && book.language.length === 2
   }
 
   private static hasValidAuthors(book: PartialScrapedBook): boolean {
@@ -49,7 +54,6 @@ export class BookValidator {
       'publicationYear',
       'coverImage',
       'pageCount',
-      'language',
       'originalLanguage',
       'publisher'
     ]

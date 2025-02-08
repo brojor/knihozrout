@@ -15,6 +15,7 @@ import {
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import SearchResult from '#models/search_result'
 import type { SearchResultItem } from '@knihozrout/scraper'
+import { errors } from '@vinejs/vine'
 
 interface QueryFilters {
   language?: string
@@ -201,6 +202,10 @@ export default class BooksController {
       return response.badRequest({ error: 'EAN kód je povinný' })
     }
 
+    if (ean.length !== 13) {
+      return response.badRequest({ error: 'EAN kód musí mít 13 číslic' })
+    }
+
     // Najdeme knihovnu - buď specifikovanou nebo výchozí
     const targetLibraryId =
       libraryId ||
@@ -250,9 +255,11 @@ export default class BooksController {
 
       return response.created(book)
     } catch (error) {
-      return response.badRequest({
-        error: error instanceof Error ? error.message : 'Neznámá chyba při získávání dat knihy',
-      })
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        return response.badRequest({ error: `Chyba při validaci dat: ${error.messages}` })
+      }
+
+      return response.badRequest({ error: 'Neznámá chyba při získávání dat knihy' })
     }
   }
 

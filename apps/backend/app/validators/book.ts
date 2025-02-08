@@ -81,12 +81,12 @@ export const filterValidator = vine.compile(
 export const scrapedBookValidator = vine.compile(
   vine.object({
     title: vine.string().trim().minLength(1).maxLength(255),
-    originalTitle: vine.string().trim().nullable(),
-    subtitle: vine.string().trim().nullable(),
-    description: vine.string().trim().nullable(),
-    publicationYear: vine.number().positive().nullable(),
-    coverImage: vine.string().trim().url().nullable(),
-    pageCount: vine.number().positive().nullable(),
+    originalTitle: vine.string().trim().optional(),
+    subtitle: vine.string().trim().optional(),
+    description: vine.string().trim().optional(),
+    publicationYear: vine.number().positive().optional(),
+    coverImage: vine.string().trim().url().optional(),
+    pageCount: vine.number().positive().optional(),
     language: vine
       .string()
       .trim()
@@ -97,9 +97,9 @@ export const scrapedBookValidator = vine.compile(
       .trim()
       .in([...SUPPORTED_LANGUAGES])
       .transform((value) => value.toLowerCase())
-      .nullable(),
+      .optional(),
     ean: vine.number().positive(),
-    publisher: vine.string().trim().nullable(),
+    publisher: vine.string().trim().optional(),
     userId: vine.number().positive(),
   })
 )

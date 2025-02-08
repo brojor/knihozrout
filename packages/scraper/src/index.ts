@@ -4,7 +4,7 @@ import { KnizniKlubProvider } from './providers/knizni_klub.js'
 import { BaseProvider } from './providers/base_provider.js'
 import { BookValidator } from './validators/book.validator.js'
 
-interface SearchResultItem {
+export interface SearchResultItem {
   url: string
   domain: string
   position: number
