@@ -101,5 +101,6 @@ export const scrapedBookValidator = vine.compile(
     ean: vine.number().positive(),
     publisher: vine.string().trim().optional(),
     userId: vine.number().positive(),
+    libraryId: vine.number().positive(),
   })
 )

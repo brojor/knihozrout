@@ -202,7 +202,7 @@ export default class BooksController {
       return response.badRequest({ error: 'EAN kód je povinný' })
     }
 
-    if (ean.length !== 13) {
+    if (ean.toString().length !== 13) {
       return response.badRequest({ error: 'EAN kód musí mít 13 číslic' })
     }
 
@@ -256,7 +256,7 @@ export default class BooksController {
       return response.created(book)
     } catch (error) {
       if (error instanceof errors.E_VALIDATION_ERROR) {
-        return response.badRequest({ error: `Chyba při validaci dat: ${error.messages}` })
+        return response.badRequest({ error: `Chyba při validaci dat: ${error.message}; ${JSON.stringify(error.messages)}` })
       }
 
       return response.badRequest({ error: 'Neznámá chyba při získávání dat knihy' })
