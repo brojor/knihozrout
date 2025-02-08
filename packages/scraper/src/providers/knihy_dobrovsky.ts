@@ -89,7 +89,7 @@ export class KnihyDobrovskyProvider extends BaseProvider {
             .filter((_, el) => $(el).text().trim().toLowerCase() === 'datum vydání')
             .next('dd').text().trim()
 
-        return publicationDate ? new Date(publicationDate).getFullYear() : undefined
+        return new Date(publicationDate).getFullYear() || undefined
     }
 
     private extractCoverImage($: cheerio.CheerioAPI): string | undefined {

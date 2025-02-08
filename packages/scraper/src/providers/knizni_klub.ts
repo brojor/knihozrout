@@ -111,9 +111,8 @@ export class KnizniKlubProvider extends BaseProvider {
             .find('td')
             .text()
             .trim();
-
-        const date = new Date(dateText)
-        return date.getFullYear() || undefined
+ 
+        return new Date(dateText).getFullYear() || undefined
     }
 
     private extractCoverImage($: cheerio.CheerioAPI): string | undefined {
