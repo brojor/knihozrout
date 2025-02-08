@@ -29,27 +29,60 @@ export interface Token {
   expiresAt: any
 }
 
+export interface Book {
+  title: string
+  originalTitle: string
+  subtitle: string
+  description: string
+  publicationYear: number
+  coverImage: string
+  pageCount: number
+  language: string
+  originalLanguage: string
+  ean: number
+  publisher: string
+  userId: number
+  createdAt: string
+  updatedAt: string
+  id: number
+  authors: Author[]
+}
+
+export interface Author {
+  id: number
+  firstName: string
+  lastName: string
+  photoUrl: any
+  birthDate: any
+  deathDate: any
+  biography: any
+  createdAt: string
+  updatedAt: string
+  fullName: string
+  sortableName: string
+}
+
 export function useApi() {
   const { $customFetch } = useNuxtApp()
 
   /*
   * Auth
   */
-  async function register(credentials: RegisterCredentials) {
+  async function register(credentials: RegisterCredentials): Promise<AuthResponse> {
     return $customFetch('/auth/register', {
       method: 'POST',
       body: credentials,
     })
   }
 
-  async function login(credentials: LoginCredentials) {
+  async function login(credentials: LoginCredentials): Promise<AuthResponse> {
     return $customFetch('/auth/login', {
       method: 'POST',
       body: credentials,
     })
   }
 
-  async function logout() {
+  async function logout(): Promise<void> {
     return $customFetch('/auth/logout', {
       method: 'POST',
     })
@@ -58,7 +91,7 @@ export function useApi() {
   /*
   * Books
   */
-  async function fetchBookByEAN(ean: string) {
+  async function fetchBookByEAN(ean: string): Promise<Book> {
     return $customFetch('/api/books/from-ean', {
       method: 'POST',
       body: { ean },
