@@ -1,7 +1,6 @@
 <script setup lang="ts">
-const { $customFetch } = useNuxtApp()
+const authStore = useAuthStore()
 const router = useRouter()
-const token = useCookie('token')
 
 const isLogin = ref(true)
 const error = ref('')
@@ -13,17 +12,12 @@ const form = reactive({
 
 async function handleSubmit() {
   try {
-    error.value = ''
-    const endpoint = isLogin.value ? '/auth/login' : '/auth/register'
-    const response = await $customFetch(endpoint, {
-      method: 'POST',
-      body: {
-        ...form,
-        fullName: isLogin.value ? undefined : form.fullName,
-      },
-    })
-
-    token.value = response.token.token
+    if (isLogin.value) {
+      await authStore.login(form)
+    }
+    else {
+      await authStore.register(form)
+    }
     await router.push('/')
   }
   catch (e: any) {

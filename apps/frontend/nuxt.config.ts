@@ -1,8 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    '@nuxt/eslint',
-  ],
+  modules: ['@nuxt/eslint', '@pinia/nuxt'],
   ssr: false,
   devtools: { enabled: true },
   runtimeConfig: {

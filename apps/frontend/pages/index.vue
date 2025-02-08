@@ -1,15 +1,11 @@
 <script setup lang="ts">
-const { $customFetch } = useNuxtApp()
+const authStore = useAuthStore()
 const router = useRouter()
-const token = useCookie('token')
 
 async function handleLogout() {
   try {
-    await $customFetch('/auth/logout', {
-      method: 'POST',
-    })
-    token.value = null
-    await router.push('/login')
+    await authStore.logout()
+    router.push('/login')
   }
   catch (e) {
     console.error('Chyba při odhlášení:', e)

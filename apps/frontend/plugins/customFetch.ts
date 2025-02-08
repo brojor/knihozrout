@@ -1,15 +1,17 @@
 export default defineNuxtPlugin((nuxtApp) => {
-  const userAuth = useCookie('token')
   const config = useRuntimeConfig()
-
+  const auth = useAuthStore()
   const $customFetch = $fetch.create({
     baseURL: config.public.baseUrl ?? 'https://api.nuxt.com',
-    onRequest({ options }) {
-      if (userAuth.value) {
-        options.headers.set('Authorization', `Bearer ${userAuth.value}`)
+    onRequest({ options }: { options: RequestInit }) {
+      if (auth.isAuthenticated) {
+        options.headers = {
+          ...options.headers,
+          Authorization: `Bearer ${auth.token}`,
+        }
       }
     },
-    onResponseError({ response }) {
+    onResponseError({ response }: { response: Response }) {
       if (response.status === 401) {
         nuxtApp.runWithContext(() => navigateTo('/login'))
       }
