@@ -31,7 +31,7 @@ export default class Book extends BaseModel {
   declare pageCount: number | null
 
   @column()
-  declare language: string
+  declare language: string | null
 
   @column()
   declare ean: number | null

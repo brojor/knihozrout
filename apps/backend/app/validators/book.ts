@@ -91,7 +91,8 @@ export const scrapedBookValidator = vine.compile(
       .string()
       .trim()
       .in([...SUPPORTED_LANGUAGES])
-      .transform((value) => value.toLowerCase()),
+      .transform((value) => value.toLowerCase())
+      .optional(),
     originalLanguage: vine
       .string()
       .trim()
