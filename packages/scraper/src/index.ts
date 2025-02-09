@@ -3,12 +3,19 @@ import { KnihyDobrovskyProvider } from './providers/knihy_dobrovsky.js'
 import { KnizniKlubProvider } from './providers/knizni_klub.js'
 import { BaseProvider } from './providers/base_provider.js'
 import { BookValidator } from './validators/book.validator.js'
+import { AlbatrosmediaProvider } from './providers/albatrosmedia_provider.js'
+import { MegaknihyProvider } from './providers/megaknihy_provider.js'
+import { MartinusProvider } from './providers/martinus_provider.js'
+import { KnihyProvider } from './providers/knihy_provider.js'
+import { DobreKnihyProvider } from './providers/dobre-knihy.cz_provider.js'
+import { KnihyCentrumProvider } from './providers/knihcentrum_provider.js'
 
 export interface SearchResultItem {
   url: string
   domain: string
   position: number
   isSupported: boolean
+  ean: number
 }
 
 export class BookScraper {
@@ -20,14 +27,20 @@ export class BookScraper {
   ) {
     this.providers = [
       new KnihyDobrovskyProvider(),
-      new KnizniKlubProvider()
+      new KnizniKlubProvider(),
+      new MartinusProvider(),
+      new AlbatrosmediaProvider(),
+      new MegaknihyProvider(),
+      new KnihyProvider(),
+      new DobreKnihyProvider(),
+      new KnihyCentrumProvider(),
     ]
   }
 
   private async searchByEan(ean: number): Promise<SearchResultItem[]> {
     const supportedDomains = this.providers.map(p => p.domain)
-    // const query = `${ean} site:${supportedDomains.join(' OR site:')}`   
-    const query = `${ean}`
+    const query = `${ean} site:${supportedDomains.join(' OR site:')}`   
+
     const response = await fetch(
       `https://www.googleapis.com/customsearch/v1?key=${this.googleApiKey}&cx=${this.googleSearchEngineId}&q=${encodeURIComponent(query)}`
     )
@@ -49,6 +62,7 @@ export class BookScraper {
           const domain = url.hostname.replace('www.', '')
           
           return {
+            ean,
             url: item.link,
             domain,
             position: index + 1,
@@ -85,7 +99,7 @@ export class BookScraper {
 
     for (const result of results) {
       const provider = this.providers.find(p => p.domain === result.domain)!
-      const bookData = await provider.scrapeBookDetails(result.url)
+      const bookData = await provider.scrapeBookDetails(result.url, result.ean)
       
       mergedBook = {
         ...bookData,

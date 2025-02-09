@@ -11,7 +11,7 @@ export abstract class BaseProvider {
    * @param url URL stránky s knihou
    * @returns Částečná data o knize - provider nemusí být schopen získat všechna data
    */
-  async scrapeBookDetails(url: string): Promise<PartialScrapedBook> {
+  async scrapeBookDetails(url: string, ean: number): Promise<PartialScrapedBook> {
     const response = await fetch(url)
     if (!response.ok) {
       throw new Error(`Failed to fetch ${url}: ${response.status}`)
@@ -19,6 +19,10 @@ export abstract class BaseProvider {
 
     const html = await response.text()
     const $ = cheerio.load(html)
+
+    if (!this.eanIsMatching($, ean)) {
+      return {}
+    }
 
     return {
       title: this.extractTitle($),
@@ -35,6 +39,8 @@ export abstract class BaseProvider {
     }
   }
 
+  protected abstract eanIsMatching($: cheerio.CheerioAPI, ean: number): boolean
+  
   protected abstract extractTitle($: cheerio.CheerioAPI): string | undefined
   protected abstract extractOriginalTitle($: cheerio.CheerioAPI): string | undefined
   protected abstract extractSubtitle($: cheerio.CheerioAPI): string | undefined

@@ -6,6 +6,15 @@ import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
 export class AlbatrosmediaProvider extends BaseProvider {
     readonly domain = 'albatrosmedia.cz'
 
+    protected eanIsMatching($: cheerio.CheerioAPI, ean: number): boolean {
+        const parsedEan = $('.product__infos span')
+        .filter((_, el) => $(el).text().trim().toLowerCase() === 'ean')
+        .next('span').text().trim()
+        
+        console.log(`Provider ${this.domain} compares ${parsedEan} with ${ean}`)
+        return parseInt(parsedEan) === ean
+    }
+
     protected extractTitle($: cheerio.CheerioAPI): string | undefined {
         const title = $('.product-top__header h1').text().trim().split(' - ')[0]
         return title || undefined

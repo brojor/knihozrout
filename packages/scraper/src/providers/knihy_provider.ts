@@ -7,6 +7,15 @@ import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
 export class KnihyProvider extends BaseProvider {
     readonly domain = 'knihy.cz'
 
+    protected eanIsMatching($: cheerio.CheerioAPI, ean: number): boolean {
+        const parsedEan = $('.box-detail__info__params dt')
+            .filter((_, el) => $(el).text().trim().toLowerCase() === 'ean:')
+            .next('dd').text().trim()
+            
+        console.log(`Provider ${this.domain} compares ${parsedEan} with ${ean}`)
+        return parseInt(parsedEan) === ean
+    }
+
     protected extractTitle($: cheerio.CheerioAPI): string | undefined {
         const title = $('h1[itemprop="name"]').text().trim()
 

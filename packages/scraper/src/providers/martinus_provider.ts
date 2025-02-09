@@ -6,6 +6,15 @@ import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
 export class MartinusProvider extends BaseProvider {
     readonly domain = 'martinus.cz'
 
+    protected eanIsMatching($: cheerio.CheerioAPI, ean: number): boolean {
+        const parsedEan = $('section#details dt')
+            .filter((_, el) => $(el).text().trim().toLowerCase() === 'isbn')
+            .next('dd').text().trim()
+        
+        console.log(`Provider ${this.domain} compares ${parsedEan} with ${ean}`)
+        return parseInt(parsedEan) === ean
+    }
+
     protected extractTitle($: cheerio.CheerioAPI): string | undefined {
         const title = $('h1.product-detail__title').text().trim().split(' - ')[0]
         

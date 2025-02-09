@@ -6,12 +6,25 @@ import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
 export class MegaknihyProvider extends BaseProvider {
     readonly domain = 'megaknihy.cz'
 
+    protected eanIsMatching($: cheerio.CheerioAPI, ean: number): boolean {
+        const scriptContent = $('script[type="application/ld+json"]').html();
+        if (!scriptContent) {
+            return false
+        }
+
+        const jsonData = JSON.parse(scriptContent);
+        const parsedEan = jsonData.gtin;
+
+        console.log(`Provider ${this.domain} compares ${parsedEan} with ${ean}`)
+        return parseInt(parsedEan) === ean
+    }
+
     protected extractTitle($: cheerio.CheerioAPI): string | undefined {
         const title = $('h1 > span[itemprop="name"]').text().trim()
         const match = title.match(/^(.+?)\s+.*\s+\1$/);
         return match ? match[1].split(' - ')[0] : undefined
     }
-    
+
     protected extractSubtitle($: cheerio.CheerioAPI): string | undefined {
         const title = $('h1 > span[itemprop="name"]').text().trim()
         const match = title.match(/^(.+?)\s+.*\s+\1$/);
@@ -21,7 +34,7 @@ export class MegaknihyProvider extends BaseProvider {
     // megaknihy nepodporují více autorů
     protected extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
         const author = $('.product-author a').text().trim()
-        
+
         return parseAuthors([author])
     }
 
@@ -44,9 +57,9 @@ export class MegaknihyProvider extends BaseProvider {
     }
 
     protected extractPublicationYear($: cheerio.CheerioAPI): number | undefined {
-        const publicationDate = $('#product_details li:contains("Rok vydání:")').contents().filter(function() {
+        const publicationDate = $('#product_details li:contains("Rok vydání:")').contents().filter(function () {
             return this.nodeType === 3; // Text node
-          }).text().trim();
+        }).text().trim();
 
         return extractYearFromDateString(publicationDate)
     }
