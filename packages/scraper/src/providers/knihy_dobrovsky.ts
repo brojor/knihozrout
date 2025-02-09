@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio'
 import { BaseProvider } from './base_provider.js'
 import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
+import { extractYearFromDateString } from '../utils/index.js'
 
 export class KnihyDobrovskyProvider extends BaseProvider {
     readonly domain = 'knihydobrovsky.cz'
@@ -89,7 +90,7 @@ export class KnihyDobrovskyProvider extends BaseProvider {
             .filter((_, el) => $(el).text().trim().toLowerCase() === 'datum vydání')
             .next('dd').text().trim()
 
-        return new Date(publicationDate).getFullYear() || undefined
+        return extractYearFromDateString(publicationDate)
     }
 
     private extractCoverImage($: cheerio.CheerioAPI): string | undefined {

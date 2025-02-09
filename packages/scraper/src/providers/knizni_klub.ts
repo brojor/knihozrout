@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio'
 import { BaseProvider } from './base_provider.js'
 import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
+import { extractYearFromDateString } from '../utils/index.js'
 
 export class KnizniKlubProvider extends BaseProvider {
     readonly domain = 'knizniklub.cz'
@@ -111,8 +112,8 @@ export class KnizniKlubProvider extends BaseProvider {
             .find('td')
             .text()
             .trim();
- 
-        return new Date(dateText).getFullYear() || undefined
+
+        return extractYearFromDateString(dateText)
     }
 
     private extractCoverImage($: cheerio.CheerioAPI): string | undefined {
