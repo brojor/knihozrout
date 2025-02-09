@@ -6,42 +6,12 @@ import { extractYearFromDateString } from '../utils/index.js'
 export class KnizniKlubProvider extends BaseProvider {
     readonly domain = 'knizniklub.cz'
 
-    private languageMap: Record<string, LanguageCode> = {
-        'česky': 'cs',
-        'slovensky': 'sk',
-        'anglicky': 'en',
-        'německy': 'de',
-        'polsky': 'pl',
-        'španělsky': 'es',
-        'francouzsky': 'fr',
-        'italsky': 'it',
+    protected extractTitle($: cheerio.CheerioAPI): string | undefined {
+        const title = $('h1[itemprop="name"]').text().trim().split(' - ')[0]
+        return title || undefined
     }
 
-    async scrapeBookDetails(url: string): Promise<PartialScrapedBook> {
-        const response = await fetch(url)
-        const html = await response.text()
-        const $ = cheerio.load(html)
-
-        return {
-            title: this.extractTitle($),
-            originalTitle: this.extractOriginalTitle($),
-            subtitle: this.extractSubtitle($),
-            description: this.extractDescription($),
-            authors: this.extractAuthors($),
-            language: this.extractLanguage($),
-            pageCount: this.extractPageCount($),
-            publisher: this.extractPublisher($),
-            publicationYear: this.extractPublicationYear($),
-            coverImage: this.extractCoverImage($),
-        }
-    }
-
-    // FIXME nevrací undefined
-    private extractTitle($: cheerio.CheerioAPI): string {
-        return $('h1[itemprop="name"]').text().trim().split(' - ')[0]
-    }
-
-    private extractOriginalTitle($: cheerio.CheerioAPI): string | undefined {
+    protected extractOriginalTitle($: cheerio.CheerioAPI): string | undefined {
         const originalTitle = $('#specification-content p').filter((_, el) => $(el)
             .find('strong').text().trim() === 'Originální název:').text()
             .replace('Originální název:', '').trim()
@@ -50,17 +20,17 @@ export class KnizniKlubProvider extends BaseProvider {
     }
 
     // TODO buď konzistentní v pořadí metod
-    private extractSubtitle($: cheerio.CheerioAPI): string | undefined {
+    protected extractSubtitle($: cheerio.CheerioAPI): string | undefined {
         const subtitle = $('h1[itemprop="name"]').text().trim().split(' - ')[1]
         return subtitle || undefined
     }
 
-    private extractDescription($: cheerio.CheerioAPI): string | undefined {
+    protected extractDescription($: cheerio.CheerioAPI): string | undefined {
         const description = $('.additional-info--content span[itemprop="description"]').text().trim()
         return description || undefined
     }
 
-    private extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
+    protected extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
         const authorText = $('.title-header__author__content').first().text().trim()
         if (!authorText) {
             return undefined
@@ -78,16 +48,16 @@ export class KnizniKlubProvider extends BaseProvider {
         return authors.length > 0 ? authors : undefined
     }
 
-    private extractLanguage($: cheerio.CheerioAPI): LanguageCode | undefined {
+    protected extractLanguage($: cheerio.CheerioAPI): LanguageCode | undefined {
         const language = $('#title-info tr')
             .filter((_, el) => $(el).find('th').text().trim() === 'Jazyk:')
             .find('a')
             .text();
 
-        return this.languageMap[language]
+        return this.languageMap[language] || undefined
     }
 
-    private extractPageCount($: cheerio.CheerioAPI): number | undefined {
+    protected extractPageCount($: cheerio.CheerioAPI): number | undefined {
         const pageCount = $('#title-info tr')
             .filter((_, el) => $(el).find('th').text().trim() === 'Počet stran:')
             .find('td')
@@ -97,7 +67,7 @@ export class KnizniKlubProvider extends BaseProvider {
         return pageCount ? parseInt(pageCount) : undefined
     }
 
-    private extractPublisher($: cheerio.CheerioAPI): string | undefined {
+    protected extractPublisher($: cheerio.CheerioAPI): string | undefined {
         const publisher = $('#title-info tr')
             .filter((_, el) => $(el).find('th').text().trim() === 'Nakladatel:')
             .find('td a')
@@ -108,7 +78,7 @@ export class KnizniKlubProvider extends BaseProvider {
         return publisher || undefined
     }
 
-    private extractPublicationYear($: cheerio.CheerioAPI): number | undefined {
+    protected extractPublicationYear($: cheerio.CheerioAPI): number | undefined {
         const dateText = $('#title-info tr')
             .filter((_, el) => $(el).find('th').text().trim() === 'Rok a měsíc vydání:')
             .find('td')
@@ -118,8 +88,12 @@ export class KnizniKlubProvider extends BaseProvider {
         return extractYearFromDateString(dateText)
     }
 
-    private extractCoverImage($: cheerio.CheerioAPI): string | undefined {
+    protected extractCoverImage($: cheerio.CheerioAPI): string | undefined {
         const imageUrl = $('.overview .illu a').attr('href')
         return imageUrl || undefined
+    }
+
+    protected extractOriginalLanguage($: cheerio.CheerioAPI): LanguageCode | undefined {
+        return undefined
     }
 } 
