@@ -3,10 +3,9 @@ import { BaseProvider } from './base_provider.js'
 import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
 import { extractYearFromDateString } from '../utils/index.js'
 
-export class MartinusProvider extends BaseProvider {
-    readonly domain = 'martinus.cz'
+export class KnihyCentrumProvider extends BaseProvider {
+    readonly domain = 'knihcentrum.cz'
 
-    // TODO přesnout do globální mapy jazyků
     private readonly languageMap: Record<string, LanguageCode> = {
         'čeština': 'cs',
         'slovenština': 'sk',
@@ -42,75 +41,59 @@ export class MartinusProvider extends BaseProvider {
         }
     }
 
-    // FIXME nevrací undefined
     private extractTitle($: cheerio.CheerioAPI): string | undefined {
-        return $('h1.product-detail__title').text().trim().split(' - ')[0]
+        const title = $('.product-name h1[itemprop="name"]').text().trim()
+
+        return title || undefined
     }
 
-    // FIXME nevrací undefined
     private extractSubtitle($: cheerio.CheerioAPI): string | undefined {
-        return $('h1.product-detail__title').text().trim().split(' - ')[1]
+        return $('#major-podnazev span').text().trim()
     }
 
+    // TODO zpracuj pomocí společné utils funkce
     private extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
-        const authorsString = $('ul.product-detail__author').attr('title')?.trim()
-
-        const authors = authorsString ? authorsString.split(' a ') : []
-
-        // TODO přesunout do utils
-        // TODO zajistit, že jména a příjmení nejsou prázdné
-        const authorsArray = authors.map((author) => {
-            const nameParts = author.trim().split(' ')
+        const authors = $('#major-autori a').map((_, el) => {
+            const fullName = $(el).text().trim()
+            const nameParts = fullName.split(' ')
             const lastName = nameParts.pop() || ''
             const firstName = nameParts.join(' ')
             return { firstName, lastName }
-        })
-
-        return authorsArray.length > 0 ? authorsArray : undefined
+        }).get()
+        
+        return authors.length > 0 ? authors : undefined
     }
 
     private extractLanguage($: cheerio.CheerioAPI) {
-        const language = $('section#details dt')
-            .filter((_, el) => $(el).text().trim().toLowerCase() === 'jazyk')
-            .next('dd').find('a').text().trim().toLowerCase()
-
-        return this.languageMap[language]
+        return undefined
     }
 
     private extractPageCount($: cheerio.CheerioAPI): number | undefined {
-        const pageCount = $('section#details dt')
-            .filter((_, el) => $(el).text().trim().toLowerCase() === 'počet stran')
-            .next('dd').text().trim()
-        
+        const pageCount = $('.data-table td').filter((_, el) => $(el).text().trim().toLowerCase() === 'počet stran').next('td').text().trim()
+
         return pageCount ? parseInt(pageCount) : undefined
     }
 
     private extractPublisher($: cheerio.CheerioAPI): string | undefined {
-        const publisher = $('section#details dt')
-            .filter((_, el) => $(el).text().trim().toLowerCase() === 'nakladatel')
-            .next('dd').find('a').text().trim()
+        const publisher = $('.data-table td').filter((_, el) => $(el).text().trim().toLowerCase() === 'značka').next('td').text().trim()
 
         return publisher ? publisher : undefined
     }
 
     private extractPublicationYear($: cheerio.CheerioAPI): number | undefined {
-        const publicationDate = $('section#details dt')
-            .filter((_, el) => $(el).text().trim().toLowerCase() === 'rok vydání')
-            .next('dd').text().trim()
+        const publicationDate = $('.data-table td').filter((_, el) => $(el).text().trim().toLowerCase() === 'rok vydání').next('td').text().trim()
 
         return extractYearFromDateString(publicationDate)
     }
 
     private extractCoverImage($: cheerio.CheerioAPI): string | undefined {
-        return undefined
+        const coverImage = $('.gallery .picture a').attr('href')
+
+        return coverImage || undefined
     }
 
     private extractOriginalTitle($: cheerio.CheerioAPI): string | undefined {
-        const originalTitle = $('section#details dt')
-            .filter((_, el) => $(el).text().trim().toLowerCase() === 'originální název')
-            .next('dd').text().trim() 
-
-        return originalTitle || undefined
+        return undefined
     }
 
     private extractOriginalLanguage($: cheerio.CheerioAPI): LanguageCode | undefined {
@@ -118,9 +101,8 @@ export class MartinusProvider extends BaseProvider {
     }
 
     private extractDescription($: cheerio.CheerioAPI): string | undefined {
-        const description = $('section#description .cms-article').text().trim()
+        const description = $('.full-description .body p').map((_, el) => $(el).text().trim()).get().join('\n').trim()
 
-        console.log(description)
-        return description ? description : undefined
+        return description || undefined
     }
 } 

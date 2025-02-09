@@ -41,10 +41,12 @@ export class KnihyDobrovskyProvider extends BaseProvider {
         }
     }
 
+    // FIXME nevrací undefined
     private extractTitle($: cheerio.CheerioAPI): string | undefined {
         return $('h1 > span[itemprop="name"]').text().trim().split(' - ')[0]
     }
-
+    
+    // FIXME nevrací undefined
     private extractSubtitle($: cheerio.CheerioAPI): string | undefined {
         return $('h1 > span[itemprop="name"]').text().trim().split(' - ')[1]
     }

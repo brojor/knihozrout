@@ -36,6 +36,7 @@ export class KnizniKlubProvider extends BaseProvider {
         }
     }
 
+    // FIXME nevrací undefined
     private extractTitle($: cheerio.CheerioAPI): string {
         return $('h1[itemprop="name"]').text().trim().split(' - ')[0]
     }
@@ -48,6 +49,7 @@ export class KnizniKlubProvider extends BaseProvider {
         return originalTitle || undefined
     }
 
+    // TODO buď konzistentní v pořadí metod
     private extractSubtitle($: cheerio.CheerioAPI): string | undefined {
         const subtitle = $('h1[itemprop="name"]').text().trim().split(' - ')[1]
         return subtitle || undefined
