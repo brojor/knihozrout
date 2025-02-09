@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import { BaseProvider } from './base_provider.js'
 import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
-import { extractYearFromDateString } from '../utils/index.js'
+import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
 
 export class MegaknihyProvider extends BaseProvider {
     readonly domain = 'megaknihy.cz'
@@ -21,11 +21,8 @@ export class MegaknihyProvider extends BaseProvider {
     // megaknihy nepodporují více autorů
     protected extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
         const author = $('.product-author a').text().trim()
-        const [firstName, lastName] = author.split(' ')
-        if (firstName && lastName) {
-            return [{ firstName, lastName }] 
-        }
-        return undefined
+        
+        return parseAuthors([author])
     }
 
     protected extractLanguage($: cheerio.CheerioAPI) {

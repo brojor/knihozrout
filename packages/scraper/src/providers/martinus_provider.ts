@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import { BaseProvider } from './base_provider.js'
 import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
-import { extractYearFromDateString } from '../utils/index.js'
+import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
 
 export class MartinusProvider extends BaseProvider {
     readonly domain = 'martinus.cz'
@@ -20,19 +20,11 @@ export class MartinusProvider extends BaseProvider {
 
     protected extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
         const authorsString = $('ul.product-detail__author').attr('title')?.trim()
+        if (!authorsString) {
+            return undefined
+        }
 
-        const authors = authorsString ? authorsString.split(' a ') : []
-
-        // TODO přesunout do utils
-        // TODO zajistit, že jména a příjmení nejsou prázdné
-        const authorsArray = authors.map((author) => {
-            const nameParts = author.trim().split(' ')
-            const lastName = nameParts.pop() || ''
-            const firstName = nameParts.join(' ')
-            return { firstName, lastName }
-        })
-
-        return authorsArray.length > 0 ? authorsArray : undefined
+        return parseAuthors(authorsString.split(' a '))
     }
 
     protected extractLanguage($: cheerio.CheerioAPI) {

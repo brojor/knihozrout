@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import { BaseProvider } from './base_provider.js'
 import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
-import { extractYearFromDateString } from '../utils/index.js'
+import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
 
 export class KnihyCentrumProvider extends BaseProvider {
     readonly domain = 'knihcentrum.cz'
@@ -20,15 +20,9 @@ export class KnihyCentrumProvider extends BaseProvider {
 
     // TODO zpracuj pomocí společné utils funkce
     protected extractAuthors($: cheerio.CheerioAPI): ScrapedAuthor[] | undefined {
-        const authors = $('#major-autori a').map((_, el) => {
-            const fullName = $(el).text().trim()
-            const nameParts = fullName.split(' ')
-            const lastName = nameParts.pop() || ''
-            const firstName = nameParts.join(' ')
-            return { firstName, lastName }
-        }).get()
+        const authors = $('#major-autori a').map((_, el) => $(el).text().trim()).get()
         
-        return authors.length > 0 ? authors : undefined
+        return parseAuthors(authors)
     }
 
     protected extractLanguage($: cheerio.CheerioAPI) {
