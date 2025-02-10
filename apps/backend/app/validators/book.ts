@@ -1,4 +1,4 @@
-import vine from '@vinejs/vine'
+import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 import { ReadingStatus } from '#models/reading_state'
 import { SUPPORTED_LANGUAGES } from '#constants/languages'
 
@@ -105,3 +105,20 @@ export const scrapedBookValidator = vine.compile(
     libraryId: vine.number().positive(),
   })
 )
+
+const messagesProvider = new SimpleMessagesProvider(
+  {
+    "ean.range": "Pole {{ field }} musí mít 13 číslic a začínat na 978 nebo 979.",
+  },
+);
+
+const eanValidator = vine.compile(
+  vine.object({
+    ean: vine
+      .number()
+      .range([9780000000000, 9799999999999])
+  })
+)
+
+eanValidator.messagesProvider = messagesProvider
+export { eanValidator }

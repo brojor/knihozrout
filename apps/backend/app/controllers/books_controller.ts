@@ -11,6 +11,7 @@ import {
   sortValidator,
   filterValidator,
   scrapedBookValidator,
+  eanValidator,
 } from '#validators/book'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import SearchResult from '#models/search_result'
@@ -195,16 +196,8 @@ export default class BooksController {
    * Vytvoří novou knihu pomocí EAN kódu
    */
   async storeFromEan({ request, auth, response }: HttpContext) {
-    const ean = request.input('ean')
+    const { ean } = await request.validateUsing(eanValidator)
     const libraryId = request.input('libraryId')
-
-    if (!ean) {
-      return response.badRequest({ error: 'EAN kód je povinný' })
-    }
-
-    if (ean.toString().length !== 13) {
-      return response.badRequest({ error: 'EAN kód musí mít 13 číslic' })
-    }
 
     // Najdeme knihovnu - buď specifikovanou nebo výchozí
     const targetLibraryId =

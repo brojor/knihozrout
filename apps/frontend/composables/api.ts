@@ -91,7 +91,7 @@ export function useApi() {
   /*
   * Books
   */
-  async function fetchBookByEAN(ean: string): Promise<Book> {
+  async function fetchBookByEAN(ean: number): Promise<Book> {
     return $customFetch('/api/books/from-ean', {
       method: 'POST',
       body: { ean },

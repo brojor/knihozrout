@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { CapacitorBarcodeScanner, CapacitorBarcodeScannerTypeHint } from '@capacitor/barcode-scanner'
 
-const scanResult = ref<string | null>(null)
+const scanResult = ref<number | null>(null)
 const book = ref<any | null>(null)
 const isLoading = ref(false)
 const errors = ref<string[]>([])
@@ -13,7 +13,7 @@ async function startScanning() {
       hint: CapacitorBarcodeScannerTypeHint.EAN_13,
       scanInstructions: 'Naskenujte čárový kód knihy',
     })
-    scanResult.value = ScanResult
+    scanResult.value = Number.parseInt(ScanResult)
   }
   catch (error) {
     console.error('Chyba při skenování:', error)
