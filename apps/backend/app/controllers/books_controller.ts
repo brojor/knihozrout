@@ -1,5 +1,5 @@
 import { HttpContext } from '@adonisjs/core/http'
-import BookScraper from '@knihozrout/scraper'
+import BookScraper, { ScrapingError } from '@knihozrout/scraper'
 import env from '#start/env'
 import Book from '#models/book'
 import Author from '#models/author'
@@ -15,6 +15,7 @@ import {
 } from '#validators/book'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import { errors } from '@vinejs/vine'
+import FailedEanLookup from '#models/failed_ean_lookup'
 
 interface QueryFilters {
   language?: string
@@ -211,10 +212,6 @@ export default class BooksController {
     try {
       const scrapedBook = await scraper.scrapeBookDetails(ean)
 
-      if (!scrapedBook) {
-        return response.notFound({ error: 'Kniha nebyla nalezena v žádném z podporovaných zdrojů' })
-      }
-
       // Vytvoření nebo nalezení autorů
       const authorIds = []
       for (const authorData of scrapedBook.authors || []) {
@@ -245,10 +242,18 @@ export default class BooksController {
     } catch (error) {
       if (error instanceof errors.E_VALIDATION_ERROR) {
         console.error(error.messages)
-        return response.badRequest({ error: `Chyba při validaci dat: ${error.message}; ${JSON.stringify(error.messages)}` })
+        return response.badRequest({ error: error.messages })
+
+      } else if (error instanceof ScrapingError) {
+        await FailedEanLookup.create({
+          ean: ean.toString(),
+          userId: auth.user!.id,
+          error: error.message,
+        })
+        return response.notFound({ error: `${error.name}: ${error.message}` })
       }
-      console.error(error)
-      return response.badRequest({ error: 'Neznámá chyba při získávání dat knihy' })
+
+      return response.badRequest({ error: `${error.name}: ${error.message}` })
     }
   }
 

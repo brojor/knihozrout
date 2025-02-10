@@ -9,6 +9,7 @@ import { MartinusProvider } from './providers/martinus_provider.js'
 import { KnihyProvider } from './providers/knihy_provider.js'
 import { DobreKnihyProvider } from './providers/dobre-knihy.cz_provider.js'
 import { KnihyCentrumProvider } from './providers/knihcentrum_provider.js'
+import { ScrapingError } from './errors/scraping_error.js'
 
 export class BookScraper {
   private readonly providers: BaseProvider[] = [
@@ -28,14 +29,11 @@ export class BookScraper {
   ) { }
 
   async scrapeBookDetails(ean: number): Promise<ScrapedBook> {
-    try {
-      const urls = await this.searchUrls(ean)
-      if (urls.length === 0) throw new Error('Nenašly se žádné výsledky')
+    const urls = await this.searchUrls(ean)
+    if (urls.length === 0) throw new ScrapingError(`Google Custom Search API nevrátilo pro EAN: ${ean} žádné výsledky!`)
 
-      return await this.scrapeFromUrls(urls, ean)
-    } catch (error) {
-      throw new Error(`Nastala chyba při vyhledávání knihy: ${error}`)
-    }
+    return await this.scrapeFromUrls(urls, ean)
+
   }
 
   private async searchUrls(ean: number): Promise<string[]> {
@@ -43,7 +41,7 @@ export class BookScraper {
       `https://www.googleapis.com/customsearch/v1?key=${this.googleApiKey}&cx=${this.googleSearchEngineId}&q=${ean}`
     )
 
-    if (!response.ok) throw new Error(`API vrátilo chybu: ${response.status}`)
+    if (!response.ok) throw new Error(`Google Custom Search API vrátilo chybu: ${response.status}: ${response.statusText}`)
 
     const data = await response.json()
     if (!data.items) return []
@@ -76,11 +74,13 @@ export class BookScraper {
     }
 
     if (!BookValidator.isValid(mergedBook)) {
-      throw new Error('Nepodařilo se získat všechna povinná data o knize')
+      throw new ScrapingError(`Nepodařilo se získat všechna povinná data o knize s EAN: ${ean}`)
     }
 
     return mergedBook
   }
 }
 
-export default BookScraper 
+export default BookScraper
+
+export { ScrapingError } from './errors/scraping_error.js' 
