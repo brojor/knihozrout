@@ -1,13 +1,12 @@
-import { KnizniKlubProvider } from './providers/knizni_klub'
+import { AlbatrosmediaProvider } from './providers/albatrosmedia_provider'
 
 async function test() {
-  const provider = new KnizniKlubProvider()
-  const url = 'https://www.knizniklub.cz/knihy/41291-pan-prstenu-spolecenstvo-prstenu.html' 
-  // const url = 'https://www.knizniklub.cz/knihy/445756-dobra-znameni-ilustrovana.html' 
+  const provider = new AlbatrosmediaProvider()
+  const url = 'https://www.albatrosmedia.cz/tituly/93592236/ctvrte-kridlo-exkluzivni-vydani/' 
 
   try {
     console.log('Stahuji data z:', url)
-    const bookDetails = await provider.scrapeBookDetails(url)
+    const bookDetails = await provider.scrapeBookDetails(url, 9788025370063)
     console.log('Detaily knihy:', JSON.stringify(bookDetails, null, 2))
   } catch (error) {
     console.error('Chyba:', error)

@@ -20,8 +20,3 @@ export interface ScrapedBook {
 }
 
 export type PartialScrapedBook = Partial<ScrapedBook>
-
-export interface SearchResult {
-  url: string
-  domain: string
-} 

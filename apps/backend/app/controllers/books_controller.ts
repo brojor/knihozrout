@@ -14,8 +14,6 @@ import {
   eanValidator,
 } from '#validators/book'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
-import SearchResult from '#models/search_result'
-import type { SearchResultItem } from '@knihozrout/scraper'
 import { errors } from '@vinejs/vine'
 
 interface QueryFilters {
@@ -211,10 +209,7 @@ export default class BooksController {
     const scraper = new BookScraper(env.get('GOOGLE_API_KEY'), env.get('GOOGLE_SEARCH_ENGINE_ID'))
 
     try {
-      const { searchResults, scrapedBook } = await scraper.searchAndScrapeBook(ean)
-
-      // Vždy uložíme výsledky vyhledávání
-      await this.saveSearchResults(ean, searchResults)
+      const scrapedBook = await scraper.scrapeBookDetails(ean)
 
       if (!scrapedBook) {
         return response.notFound({ error: 'Kniha nebyla nalezena v žádném z podporovaných zdrojů' })
@@ -249,23 +244,12 @@ export default class BooksController {
       return response.created(book)
     } catch (error) {
       if (error instanceof errors.E_VALIDATION_ERROR) {
+        console.error(error.messages)
         return response.badRequest({ error: `Chyba při validaci dat: ${error.message}; ${JSON.stringify(error.messages)}` })
       }
-
+      console.error(error)
       return response.badRequest({ error: 'Neznámá chyba při získávání dat knihy' })
     }
-  }
-
-  private async saveSearchResults(ean: number, results: SearchResultItem[]) {
-    await SearchResult.createMany(
-      results.map(result => ({
-        ean,
-        domain: result.domain,
-        position: result.position,
-        url: result.url,
-        isSupported: result.isSupported
-      }))
-    )
   }
 
   /**

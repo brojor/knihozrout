@@ -1,4 +1,4 @@
-import { ScrapedBook } from './types/book.js'
+import { PartialScrapedBook, ScrapedBook } from './types/book.js'
 import { KnihyDobrovskyProvider } from './providers/knihy_dobrovsky.js'
 import { KnizniKlubProvider } from './providers/knizni_klub.js'
 import { BaseProvider } from './providers/base_provider.js'
@@ -10,105 +10,69 @@ import { KnihyProvider } from './providers/knihy_provider.js'
 import { DobreKnihyProvider } from './providers/dobre-knihy.cz_provider.js'
 import { KnihyCentrumProvider } from './providers/knihcentrum_provider.js'
 
-export interface SearchResultItem {
-  url: string
-  domain: string
-  position: number
-  isSupported: boolean
-  ean: number
-}
-
 export class BookScraper {
-  private readonly providers: BaseProvider[]
+  private readonly providers: BaseProvider[] = [
+    new KnihyDobrovskyProvider(),
+    new KnizniKlubProvider(),
+    new MartinusProvider(),
+    new AlbatrosmediaProvider(),
+    new MegaknihyProvider(),
+    new KnihyProvider(),
+    new DobreKnihyProvider(),
+    new KnihyCentrumProvider(),
+  ]
 
   constructor(
     private readonly googleApiKey: string,
     private readonly googleSearchEngineId: string,
-  ) {
-    this.providers = [
-      new KnihyDobrovskyProvider(),
-      new KnizniKlubProvider(),
-      new MartinusProvider(),
-      new AlbatrosmediaProvider(),
-      new MegaknihyProvider(),
-      new KnihyProvider(),
-      new DobreKnihyProvider(),
-      new KnihyCentrumProvider(),
-    ]
+  ) { }
+
+  async scrapeBookDetails(ean: number): Promise<ScrapedBook> {
+    try {
+      const urls = await this.searchUrls(ean)
+      if (urls.length === 0) throw new Error('Nenašly se žádné výsledky')
+
+      return await this.scrapeFromUrls(urls, ean)
+    } catch (error) {
+      throw new Error(`Nastala chyba při vyhledávání knihy: ${error}`)
+    }
   }
 
-  private async searchByEan(ean: number): Promise<SearchResultItem[]> {
-    const supportedDomains = this.providers.map(p => p.domain)
-    const query = `${ean} site:${supportedDomains.join(' OR site:')}`   
-
+  private async searchUrls(ean: number): Promise<string[]> {
     const response = await fetch(
-      `https://www.googleapis.com/customsearch/v1?key=${this.googleApiKey}&cx=${this.googleSearchEngineId}&q=${encodeURIComponent(query)}`
+      `https://www.googleapis.com/customsearch/v1?key=${this.googleApiKey}&cx=${this.googleSearchEngineId}&q=${ean}`
     )
 
-    if (!response.ok) {
-      throw new Error(`API vrátilo chybu: ${response.status}`)
-    }
+    if (!response.ok) throw new Error(`API vrátilo chybu: ${response.status}`)
 
     const data = await response.json()
-    
-    if (!data.items) {
-      return []
-    }
+    if (!data.items) return []
 
     return data.items
-      .map((item: any, index: number) => {
+      .map((item: any) => {
         try {
           const url = new URL(item.link)
-          const domain = url.hostname.replace('www.', '')
-          
-          return {
-            ean,
-            url: item.link,
-            domain,
-            position: index + 1,
-            isSupported: supportedDomains.includes(domain)
-          }
-        } catch (e) {
+          return url.toString()
+        } catch {
           return null
         }
       })
-      .filter((result: SearchResultItem | null): result is SearchResultItem => result !== null)
+      .filter((url: string | null): url is string => url !== null)
   }
 
-  public async searchAndScrapeBook(ean: number): Promise<{
-    searchResults: SearchResultItem[],
-    scrapedBook?: ScrapedBook
-  }> {
-    const searchResults = await this.searchByEan(ean)
-    const supportedResults = searchResults.filter(r => r.isSupported)
+  private async scrapeFromUrls(urls: string[], ean: number): Promise<ScrapedBook> {
+    let mergedBook: PartialScrapedBook = {}
 
-    if (supportedResults.length === 0) {
-      return { searchResults }
-    }
+    for (const url of urls) {
+      const domain = new URL(url).hostname.replace('www.', '')
+      const provider = this.providers.find(p => p.domain === domain)
+      if (!provider) continue
 
-    try {
-      const scrapedBook = await this.scrapeBookFromResults(supportedResults)
-      return { searchResults, scrapedBook }
-    } catch (error) {
-      return { searchResults }
-    }
-  }
+      const bookData = await provider.scrapeBookDetails(url, ean)
 
-  private async scrapeBookFromResults(results: SearchResultItem[]): Promise<ScrapedBook> {
-    let mergedBook: Partial<ScrapedBook> = {}
+      mergedBook = { ...bookData, ...mergedBook }
 
-    for (const result of results) {
-      const provider = this.providers.find(p => p.domain === result.domain)!
-      const bookData = await provider.scrapeBookDetails(result.url, result.ean)
-      
-      mergedBook = {
-        ...bookData,
-        ...mergedBook
-      }
-
-      if (BookValidator.isComplete(mergedBook)) {
-        break;
-      }
+      if (BookValidator.isComplete(mergedBook)) break
     }
 
     if (!BookValidator.isValid(mergedBook)) {
