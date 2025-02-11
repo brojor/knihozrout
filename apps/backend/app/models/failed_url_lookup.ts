@@ -1,12 +1,12 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
-export default class FailedEanLookup extends BaseModel {
+export default class FailedUrlLookup extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare ean: number
+  declare url: string
 
   @column()
   declare userId: number
