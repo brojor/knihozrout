@@ -3,14 +3,14 @@ import { DetailsProviderError, EanProviderError, ScraperError } from './errors/s
 import { BookValidator } from './validators/book.validator.js'
 import { BaseDetailsProvider } from './providers/baseDetailsProvider.js'
 import { BaseEanProvider } from './providers/baseEanProvider.js'
-import { AlbatrosmediaDetailsProvider, AlbatrosmediaEanProvider } from './providers/albatrosmedia'
-import { MegaknihyDetailsProvider, MegaknihyEanProvider } from './providers/megaknihy'
-import { MartinusDetailsProvider, MartinusEanProvider } from './providers/martinus'
-import { KnizniKlubDetailsProvider, KnizniKlubEanProvider } from './providers/knizni-klub'
-import { KnihyDobrovskyDetailsProvider, KnihyDobrovskyEanProvider } from './providers/knihy-dobrovsky'
-import { KnihyDetailsProvider, KnihyEanProvider } from './providers/knihy'
-import { DobreKnihyDetailsProvider, DobreKnihyEanProvider } from './providers/dobre-knihy'
-import { KnihcentrumDetailsProvider, KnihcentrumEanProvider } from './providers/knihcentrum'
+import { AlbatrosmediaDetailsProvider, AlbatrosmediaEanProvider } from './providers/albatrosmedia/index.js'
+import { MegaknihyDetailsProvider, MegaknihyEanProvider } from './providers/megaknihy/index.js'
+import { MartinusDetailsProvider, MartinusEanProvider } from './providers/martinus/index.js'
+import { KnizniKlubDetailsProvider, KnizniKlubEanProvider } from './providers/knizni-klub/index.js'
+import { KnihyDobrovskyDetailsProvider, KnihyDobrovskyEanProvider } from './providers/knihy-dobrovsky/index.js'
+import { KnihyDetailsProvider, KnihyEanProvider } from './providers/knihy/index.js'
+import { DobreKnihyDetailsProvider, DobreKnihyEanProvider } from './providers/dobre-knihy/index.js'
+import { KnihcentrumDetailsProvider, KnihcentrumEanProvider } from './providers/knihcentrum/index.js'
 
 export class BookScraper {
   private readonly detailsProviders: BaseDetailsProvider[]

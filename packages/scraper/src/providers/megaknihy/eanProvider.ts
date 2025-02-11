@@ -11,7 +11,7 @@ export class MegaknihyEanProvider extends BaseEanProvider {
     }
 
     const jsonData = JSON.parse(eanText)
-    const ean = jsonData.gtin
+    const ean = parseInt(jsonData.gtin)
     return isNaN(ean) ? undefined : ean
   }
 }

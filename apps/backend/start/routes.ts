@@ -29,6 +29,7 @@ router
 router
   .group(() => {
     router.post('/books/from-ean', '#controllers/books_controller.storeFromEan')
+    router.post('/books/from-url', '#controllers/books_controller.storeFromUrl')
   })
   .prefix('/api')
   .use(middleware.auth())

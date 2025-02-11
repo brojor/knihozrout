@@ -44,7 +44,7 @@ export default class BooksController {
       // Příprava dat pro knihu
       const bookData = {
         ...scrapedBook,
-        ean: Number(ean),
+        ean,
         userId: auth.user!.id,
         libraryId: targetLibraryId,
       }
