@@ -84,19 +84,24 @@ export class BookScraper {
 
   private async scrapeFromUrls(urls: string[], ean: number): Promise<ScrapedBook> {
     let mergedBook: PartialScrapedBook = {}
+    const usedProviders = new Set<string>()
 
     for (const url of urls) {
       const domain = new URL(url).hostname.replace('www.', '')
       const provider = this.detailsProviders.find(p => p.domain === domain)
-      if (!provider) continue
+      
+      if (!provider || usedProviders.has(provider.domain)) continue
 
       const bookData = await provider.scrapeBookDetails(url, ean)
-
-      mergedBook = {
-        ...mergedBook,
-        ...Object.fromEntries(
-          Object.entries(bookData).filter(([_, value]) => value !== undefined)
-        ),
+      
+      if (Object.keys(bookData).length > 0) {
+        usedProviders.add(provider.domain)
+        mergedBook = {
+          ...mergedBook,
+          ...Object.fromEntries(
+            Object.entries(bookData).filter(([_, value]) => value !== undefined)
+          ),
+        }
       }
 
       if (BookValidator.isComplete(mergedBook)) break
