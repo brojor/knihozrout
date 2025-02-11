@@ -92,7 +92,12 @@ export class BookScraper {
 
       const bookData = await provider.scrapeBookDetails(url, ean)
 
-      mergedBook = { ...bookData, ...mergedBook }
+      mergedBook = {
+        ...mergedBook,
+        ...Object.fromEntries(
+          Object.entries(bookData).filter(([_, value]) => value !== undefined)
+        ),
+      }
 
       if (BookValidator.isComplete(mergedBook)) break
     }
