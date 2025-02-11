@@ -1,8 +1,8 @@
 import * as cheerio from 'cheerio'
 import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book'
 import { LANGUAGE_MAP } from '../constants/language-map.js'
-
-export abstract class BaseProvider {
+import { DetailsProviderError } from '../errors/scraperError.js'
+export abstract class BaseDetailsProvider {
   abstract readonly domain: string
   protected readonly languageMap = LANGUAGE_MAP
 
@@ -14,7 +14,7 @@ export abstract class BaseProvider {
   async scrapeBookDetails(url: string, ean: number): Promise<PartialScrapedBook> {
     const response = await fetch(url)
     if (!response.ok) {
-      throw new Error(`Failed to fetch ${url}: ${response.status}`)
+      throw new DetailsProviderError(`Failed to fetch ${url}: ${response.status} - ${response.statusText}`)
     }
 
     const html = await response.text()

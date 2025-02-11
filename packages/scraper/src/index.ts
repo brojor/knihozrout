@@ -1,39 +1,63 @@
 import { PartialScrapedBook, ScrapedBook } from './types/book.js'
-import { KnihyDobrovskyProvider } from './providers/knihy_dobrovsky.js'
-import { KnizniKlubProvider } from './providers/knizni_klub.js'
-import { BaseProvider } from './providers/base_provider.js'
+import { DetailsProviderError, EanProviderError, ScraperError } from './errors/scraperError.js'
 import { BookValidator } from './validators/book.validator.js'
-import { AlbatrosmediaProvider } from './providers/albatrosmedia_provider.js'
-import { MegaknihyProvider } from './providers/megaknihy_provider.js'
-import { MartinusProvider } from './providers/martinus_provider.js'
-import { KnihyProvider } from './providers/knihy_provider.js'
-import { DobreKnihyProvider } from './providers/dobre-knihy.cz_provider.js'
-import { KnihyCentrumProvider } from './providers/knihcentrum_provider.js'
-import { ScrapingError } from './errors/scraping_error.js'
+import { BaseDetailsProvider } from './providers/baseDetailsProvider.js'
+import { BaseEanProvider } from './providers/baseEanProvider.js'
+import { AlbatrosmediaDetailsProvider, AlbatrosmediaEanProvider } from './providers/albatrosmedia'
+import { MegaknihyDetailsProvider, MegaknihyEanProvider } from './providers/megaknihy'
+import { MartinusDetailsProvider, MartinusEanProvider } from './providers/martinus'
+import { KnizniKlubDetailsProvider, KnizniKlubEanProvider } from './providers/knizni-klub'
+import { KnihyDobrovskyDetailsProvider, KnihyDobrovskyEanProvider } from './providers/knihy-dobrovsky'
+import { KnihyDetailsProvider, KnihyEanProvider } from './providers/knihy'
+import { DobreKnihyDetailsProvider, DobreKnihyEanProvider } from './providers/dobre-knihy'
+import { KnihcentrumDetailsProvider, KnihcentrumEanProvider } from './providers/knihcentrum'
 
 export class BookScraper {
-  private readonly providers: BaseProvider[] = [
-    new KnihyDobrovskyProvider(),
-    new KnizniKlubProvider(),
-    new MartinusProvider(),
-    new AlbatrosmediaProvider(),
-    new MegaknihyProvider(),
-    new KnihyProvider(),
-    new DobreKnihyProvider(),
-    new KnihyCentrumProvider(),
-  ]
+  private readonly detailsProviders: BaseDetailsProvider[]
+  private readonly eanProviders: BaseEanProvider[]
 
   constructor(
     private readonly googleApiKey: string,
     private readonly googleSearchEngineId: string,
-  ) { }
+  ) { 
+    this.detailsProviders = [
+      new KnihyDobrovskyDetailsProvider(),
+      new KnizniKlubDetailsProvider(),
+      new MartinusDetailsProvider(),
+      new AlbatrosmediaDetailsProvider(),
+      new MegaknihyDetailsProvider(),
+      new KnihyDetailsProvider(),
+      new DobreKnihyDetailsProvider(),
+      new KnihcentrumDetailsProvider(),
+    ]
+
+    this.eanProviders = [
+      new KnihyDobrovskyEanProvider(),
+      new KnizniKlubEanProvider(),
+      new MartinusEanProvider(),
+      new AlbatrosmediaEanProvider(),
+      new MegaknihyEanProvider(),
+      new KnihyEanProvider(),
+      new DobreKnihyEanProvider(),
+      new KnihcentrumEanProvider(),
+    ]
+  }
 
   async scrapeBookDetails(ean: number): Promise<ScrapedBook> {
     const urls = await this.searchUrls(ean)
-    if (urls.length === 0) throw new ScrapingError(`Google Custom Search API nevrátilo pro EAN: ${ean} žádné výsledky!`)
+    if (urls.length === 0) throw new DetailsProviderError(`Google Custom Search API nevrátilo pro EAN: ${ean} žádné výsledky!`)
 
     return await this.scrapeFromUrls(urls, ean)
 
+  }
+
+  async getEanFromUrl(url: string): Promise<number> {
+    const provider = this.eanProviders.find(p => p.canHandle(url))
+    if (!provider) {
+      throw new EanProviderError(`Nenalezen provider pro URL: ${url}`)
+    }
+
+    return await provider.getEanFromUrl(url)
   }
 
   private async searchUrls(ean: number): Promise<string[]> {
@@ -41,7 +65,7 @@ export class BookScraper {
       `https://www.googleapis.com/customsearch/v1?key=${this.googleApiKey}&cx=${this.googleSearchEngineId}&q=${ean}`
     )
 
-    if (!response.ok) throw new Error(`Google Custom Search API vrátilo chybu: ${response.status}: ${response.statusText}`)
+    if (!response.ok) throw new DetailsProviderError(`Google Custom Search API vrátilo chybu: ${response.status}: ${response.statusText}`)
 
     const data = await response.json()
     if (!data.items) return []
@@ -63,7 +87,7 @@ export class BookScraper {
 
     for (const url of urls) {
       const domain = new URL(url).hostname.replace('www.', '')
-      const provider = this.providers.find(p => p.domain === domain)
+      const provider = this.detailsProviders.find(p => p.domain === domain)
       if (!provider) continue
 
       const bookData = await provider.scrapeBookDetails(url, ean)
@@ -74,7 +98,7 @@ export class BookScraper {
     }
 
     if (!BookValidator.isValid(mergedBook)) {
-      throw new ScrapingError(`Nepodařilo se získat všechna povinná data o knize s EAN: ${ean}`)
+      throw new DetailsProviderError(`Nepodařilo se získat všechna povinná data o knize s EAN: ${ean}`)
     }
 
     return mergedBook
@@ -83,4 +107,4 @@ export class BookScraper {
 
 export default BookScraper
 
-export { ScrapingError } from './errors/scraping_error.js' 
+export { EanProviderError, DetailsProviderError, ScraperError } from './errors/scraperError.js' 

@@ -1,7 +1,7 @@
-import { AlbatrosmediaProvider } from './providers/albatrosmedia_provider'
+import { AlbatrosmediaDetailsProvider } from './providers/albatrosmedia'
 
 async function test() {
-  const provider = new AlbatrosmediaProvider()
+  const provider = new AlbatrosmediaDetailsProvider()
   const url = 'https://www.albatrosmedia.cz/tituly/93592236/ctvrte-kridlo-exkluzivni-vydani/' 
 
   try {

@@ -1,5 +1,5 @@
 import { HttpContext } from '@adonisjs/core/http'
-import BookScraper, { ScrapingError } from '@knihozrout/scraper'
+import BookScraper, { DetailsProviderError } from '@knihozrout/scraper'
 import env from '#start/env'
 import Book from '#models/book'
 import Author from '#models/author'
@@ -243,8 +243,7 @@ export default class BooksController {
       if (error instanceof errors.E_VALIDATION_ERROR) {
         console.error(error.messages)
         return response.badRequest({ error: error.messages })
-
-      } else if (error instanceof ScrapingError) {
+      } else if (error instanceof DetailsProviderError) {
         await FailedEanLookup.create({
           ean: ean.toString(),
           userId: auth.user!.id,

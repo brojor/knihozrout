@@ -1,9 +1,9 @@
 import * as cheerio from 'cheerio'
-import { BaseProvider } from './base_provider.js'
-import { LanguageCode, PartialScrapedBook, ScrapedAuthor } from '../types/book.js'
-import { extractYearFromDateString, parseAuthors } from '../utils/index.js'
+import { BaseDetailsProvider } from '../baseDetailsProvider.js'
+import { LanguageCode, ScrapedAuthor } from '../../types/book.js'
+import { extractYearFromDateString, parseAuthors } from '../../utils/index.js'
 
-export class KnihyCentrumProvider extends BaseProvider {
+export class KnihcentrumDetailsProvider extends BaseDetailsProvider {
     readonly domain = 'knihcentrum.cz'
 
     protected eanIsMatching($: cheerio.CheerioAPI, ean: number): boolean {
