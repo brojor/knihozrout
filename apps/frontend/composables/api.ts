@@ -14,52 +14,92 @@ export interface AuthResponse {
 
 export interface User {
   id: number
-  fullName: string
+  fullName: string | null
   email: string
   createdAt: string
-  updatedAt: string
+  updatedAt: string | null
 }
 
 export interface Token {
   type: string
-  name: any
+  name: string | null
   token: string
   abilities: string[]
-  lastUsedAt: any
-  expiresAt: any
+  lastUsedAt: string | null
+  expiresAt: string | null
 }
 
 export interface Book {
-  title: string
-  originalTitle: string
-  subtitle: string
-  description: string
-  publicationYear: number
-  coverImage: string
-  pageCount: number
-  language: string
-  originalLanguage: string
-  ean: number
-  publisher: string
-  userId: number
-  createdAt: string
-  updatedAt: string
   id: number
+  title: string
+  subtitle: string | null
+  originalTitle: string | null
+  description: string | null
+  publicationYear: number | null
+  coverImage: string | null
+  pageCount: number | null
+  language: string | null
+  originalLanguage: string | null
+  ean: number | null
+  publisher: string | null
+  userId: number
+  libraryId: number
+  seriesId: number | null
+  seriesOrder: number | null
+  createdAt: string
+  updatedAt: string | null
   authors: Author[]
+  genres?: Genre[]
+  series?: Series
+  library?: Library
+  readingState?: ReadingState
 }
 
 export interface Author {
   id: number
   firstName: string
   lastName: string
-  photoUrl: any
-  birthDate: any
-  deathDate: any
-  biography: any
-  createdAt: string
-  updatedAt: string
+  photoUrl: string | null
+  birthDate: string | null
+  deathDate: string | null
+  biography: string | null
   fullName: string
   sortableName: string
+  createdAt: string
+  updatedAt: string | null
+}
+
+export interface Genre {
+  id: number
+  name: string
+  createdAt: string
+  updatedAt: string | null
+}
+
+export interface Series {
+  id: number
+  name: string
+  description: string | null
+  plannedBooksCount: number | null
+  createdAt: string
+  updatedAt: string | null
+}
+
+export interface Library {
+  id: number
+  name: string
+  description: string | null
+  userId: number
+  createdAt: string
+  updatedAt: string | null
+}
+
+export interface ReadingState {
+  id: number
+  bookId: number
+  status: 'unread' | 'reading' | 'read' | 'paused' | 'want_to_read' | 'wishlist'
+  createdAt: string
+  updatedAt: string | null
 }
 
 export function useApi() {
@@ -98,10 +138,25 @@ export function useApi() {
     })
   }
 
+  async function fetchBookFromUrl(url: string): Promise<Book> {
+    return $customFetch('/api/books/from-url', {
+      method: 'POST',
+      body: { url },
+    })
+  }
+
+  async function fetchBook(id: number): Promise<Book> {
+    return $customFetch(`/api/books/${id}`, {
+      method: 'GET',
+    })
+  }
+
   return {
     register,
     login,
     logout,
     fetchBookByEAN,
+    fetchBookFromUrl,
+    fetchBook,
   }
 }

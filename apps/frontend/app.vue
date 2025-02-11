@@ -1,8 +1,12 @@
 <script setup lang="ts">
+const router = useRouter()
+
 onMounted(() => {
   window.handleSharedText = (sharedText: string) => {
-    console.log('Sdílený obsah:', sharedText)
-    alert(`Přijatý text: ${sharedText}`)
+    router.push({
+      path: '/bookFromUrl',
+      query: { url: sharedText },
+    })
   }
 })
 </script>
@@ -12,3 +16,12 @@ onMounted(() => {
     <NuxtPage />
   </div>
 </template>
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+</style>

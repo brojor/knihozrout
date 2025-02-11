@@ -5,6 +5,8 @@ const scanResult = ref<number | null>(null)
 const book = ref<any | null>(null)
 const isLoading = ref(false)
 const errors = ref<string[]>([])
+const router = useRouter()
+const booksStore = useBooksStore()
 
 async function startScanning() {
   errors.value = []
@@ -33,6 +35,8 @@ async function fetchBookByEAN() {
   try {
     const response = await useApi().fetchBookByEAN(scanResult.value)
     book.value = response
+    booksStore.setCurrentBook(response)
+    router.push(`/book/${response.id}`)
   }
   catch (error) {
     const err = error as { response?: { status: number, _data?: { error?: string } } }
