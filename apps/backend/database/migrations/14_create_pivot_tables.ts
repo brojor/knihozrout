@@ -28,11 +28,30 @@ export default class extends BaseSchema {
       table.boolean('completed').defaultTo(false)
       table.primary(['book_id', 'reading_challenge_id'])
     })
+
+    // Vazba knih a knihoven
+    this.schema.createTable('book_library', (table) => {
+      table.integer('book_id').unsigned().references('id').inTable('books').notNullable()
+      table.integer('library_id').unsigned().references('id').inTable('libraries').notNullable()
+      table.primary(['book_id', 'library_id'])
+    })
+
+    // Vazba knih a sérií
+    this.schema.createTable('book_series', (table) => {
+      table.integer('book_id').unsigned().references('id').inTable('books').notNullable()
+      table.integer('series_id').unsigned().references('id').inTable('series').notNullable()
+      table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
+      table.integer('order').nullable()
+
+      table.unique(['book_id', 'series_id', 'user_id'])
+    })
   }
 
   async down() {
-    this.schema.dropTable('author_book')
-    this.schema.dropTable('book_genre')
+    this.schema.dropTable('book_series')
+    this.schema.dropTable('book_library')
     this.schema.dropTable('book_reading_challenge')
+    this.schema.dropTable('book_genre')
+    this.schema.dropTable('author_book')
   }
 }

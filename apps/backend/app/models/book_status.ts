@@ -4,15 +4,13 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Book from '#models/book'
 import User from '#models/user'
 
-export enum ReadingStatus {
-  UNREAD = 'unread',
-  READING = 'reading',
-  READ = 'read',
-  PAUSED = 'paused',
-  WANT_TO_READ = 'want_to_read',
+export enum OwnershipStatus {
+  OWNED = 'owned',
+  WISHLIST = 'wishlist',
+  TRACKED = 'tracked', // Pro knihy, které uživatel nevlastní, ale chce sledovat (např. v sérii)
 }
 
-export default class ReadingState extends BaseModel {
+export default class BookStatus extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
@@ -23,7 +21,7 @@ export default class ReadingState extends BaseModel {
   declare userId: number
 
   @column()
-  declare status: ReadingStatus
+  declare status: OwnershipStatus
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

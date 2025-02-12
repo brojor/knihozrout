@@ -7,14 +7,14 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.integer('book_id').unsigned().references('id').inTable('books').notNullable()
-      table
-        .enum('status', ['unread', 'reading', 'read', 'paused', 'want_to_read', 'wishlist'])
-        .notNullable()
+      table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
+      table.enum('status', ['unread', 'reading', 'read', 'paused', 'want_to_read']).notNullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
 
-      table.unique(['book_id'])
+      // Jeden uživatel může mít jeden reading state pro jednu knihu
+      table.unique(['book_id', 'user_id'])
     })
   }
 

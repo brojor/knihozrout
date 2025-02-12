@@ -8,8 +8,25 @@ import { scrapedBookValidator, eanValidator } from '#validators/book'
 import { errors } from '@vinejs/vine'
 import FailedEanLookup from '#models/failed_ean_lookup'
 import FailedUrlLookup from '#models/failed_url_lookup'
+import BookStatus from '#models/book_status'
+import { OwnershipStatus } from '#models/book_status'
 
 export default class BooksController {
+  private async getTargetLibrary(auth: HttpContext['auth'], libraryId?: number) {
+    if (libraryId) {
+      return await Library.query()
+        .where('id', libraryId)
+        .where('user_id', auth.user!.id)
+        .firstOrFail()
+    }
+
+    // Pokud není libraryId specifikováno, použijeme první (a jedinou) knihovnu uživatele
+    return await Library.query()
+      .where('user_id', auth.user!.id)
+      .orderBy('created_at', 'asc')
+      .firstOrFail()
+  }
+
   /**
    * Vytvoří novou knihu pomocí EAN kódu
    */
@@ -17,19 +34,27 @@ export default class BooksController {
     const { ean } = await request.validateUsing(eanValidator)
     const libraryId = request.input('libraryId')
 
-    // Najdeme knihovnu - buď specifikovanou nebo výchozí
-    const targetLibraryId =
-      libraryId ||
-      (await Library.query()
-        .where('userId', auth.user!.id)
-        .orderBy('createdAt', 'asc')
-        .firstOrFail()
-        .then((library) => library.id))
+    const savedBook = await Book.findBy('ean', ean)
+    if (savedBook) {
+      const targetLibrary = await this.getTargetLibrary(auth, libraryId)
+
+      // Vytvoříme BookStatus a přidáme do knihovny
+      await BookStatus.create({
+        bookId: savedBook.id,
+        userId: auth.user!.id,
+        status: OwnershipStatus.OWNED,
+      })
+      await savedBook.related('libraries').attach([targetLibrary.id])
+
+      await savedBook.load('authors')
+      return response.ok(savedBook)
+    }
 
     const scraper = new BookScraper(env.get('GOOGLE_API_KEY'), env.get('GOOGLE_SEARCH_ENGINE_ID'))
 
     try {
       const scrapedBook = await scraper.scrapeBookDetails(ean)
+      const targetLibrary = await this.getTargetLibrary(auth, libraryId)
 
       // Vytvoření nebo nalezení autorů
       const authorIds = []
@@ -41,22 +66,22 @@ export default class BooksController {
         authorIds.push(author.id)
       }
 
-      // Příprava dat pro knihu
-      const bookData = {
-        ...scrapedBook,
-        ean,
-        userId: auth.user!.id,
-        libraryId: targetLibraryId,
-      }
-
       // Validace dat
-      const validatedData = await scrapedBookValidator.validate(bookData)
+      const validatedData = await scrapedBookValidator.validate({ ...scrapedBook, ean })
 
       // Vytvoření knihy včetně vztahů
       const book = await Book.create(validatedData)
       await book.related('authors').attach(authorIds)
-      await book.load('authors')
 
+      // Vytvoření BookStatus a přidání do knihovny
+      await BookStatus.create({
+        bookId: book.id,
+        userId: auth.user!.id,
+        status: OwnershipStatus.OWNED,
+      })
+      await book.related('libraries').attach([targetLibrary.id])
+
+      await book.load('authors')
       return response.created(book)
     } catch (error) {
       if (error instanceof errors.E_VALIDATION_ERROR) {
@@ -83,23 +108,31 @@ export default class BooksController {
     const libraryId = request.input('libraryId')
     let ean: number | undefined
 
-    // Najdeme knihovnu - buď specifikovanou nebo výchozí
-    const targetLibraryId =
-      libraryId ||
-      (await Library.query()
-        .where('userId', auth.user!.id)
-        .orderBy('createdAt', 'asc')
-        .firstOrFail()
-        .then((library) => library.id))
-
     const scraper = new BookScraper(env.get('GOOGLE_API_KEY'), env.get('GOOGLE_SEARCH_ENGINE_ID'))
 
     try {
       // Získáme EAN z URL
       ean = await scraper.getEanFromUrl(url)
 
-      // Použijeme existující logiku pro získání detailů knihy
+      const savedBook = await Book.findBy('ean', ean)
+
+      if (savedBook) {
+        const targetLibrary = await this.getTargetLibrary(auth, libraryId)
+
+        // Vytvoříme BookStatus a přidáme do knihovny
+        await BookStatus.create({
+          bookId: savedBook.id,
+          userId: auth.user!.id,
+          status: OwnershipStatus.OWNED,
+        })
+        await savedBook.related('libraries').attach([targetLibrary.id])
+
+        await savedBook.load('authors')
+        return response.ok(savedBook)
+      }
+
       const scrapedBook = await scraper.scrapeBookDetails(ean)
+      const targetLibrary = await this.getTargetLibrary(auth, libraryId)
 
       // Vytvoření nebo nalezení autorů
       const authorIds = []
@@ -111,20 +144,21 @@ export default class BooksController {
         authorIds.push(author.id)
       }
 
-      // Příprava dat pro knihu
-      const bookData = {
-        ...scrapedBook,
-        ean,
-        userId: auth.user!.id,
-        libraryId: targetLibraryId,
-      }
-
       // Validace dat
-      const validatedData = await scrapedBookValidator.validate(bookData)
+      const validatedData = await scrapedBookValidator.validate({ ...scrapedBook, ean })
 
       // Vytvoření knihy včetně vztahů
       const book = await Book.create(validatedData)
       await book.related('authors').attach(authorIds)
+
+      // Vytvoření BookStatus a přidání do knihovny
+      await BookStatus.create({
+        bookId: book.id,
+        userId: auth.user!.id,
+        status: OwnershipStatus.OWNED,
+      })
+      await book.related('libraries').attach([targetLibrary.id])
+
       await book.load('authors')
 
       return response.created(book)

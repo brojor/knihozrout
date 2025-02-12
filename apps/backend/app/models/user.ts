@@ -11,6 +11,8 @@ import ReadingState from '#models/reading_state'
 import ReadingSession from '#models/reading_session'
 import ReadingChallenge from '#models/reading_challenge'
 import BookLoan from '#models/book_loan'
+import Series from '#models/series'
+import BookStatus from '#models/book_status'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -53,6 +55,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => BookLoan)
   declare bookLoans: HasMany<typeof BookLoan>
+
+  @hasMany(() => Series)
+  declare series: HasMany<typeof Series>
+
+  @hasMany(() => BookStatus)
+  declare bookStatuses: HasMany<typeof BookStatus>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }
