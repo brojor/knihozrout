@@ -11,6 +11,12 @@ import { AuthorService } from '#services/author_service'
 import env from '#start/env'
 import { DetailsProviderError, EanProviderError } from '@knihozrout/scraper'
 
+interface BookOperationResult {
+  book: Book
+  wasAddedToLibrary: boolean
+  existsInOtherLibrary: boolean
+}
+
 export class BookService {
   private libraryService: LibraryService
   private authorService: AuthorService
@@ -26,24 +32,41 @@ export class BookService {
     return await BookStatus.updateOrCreate({ bookId, userId: this.auth.user!.id }, { status })
   }
 
-  private async handleExistingBook(book: Book, libraryId?: number): Promise<Book> {
+  private async handleExistingBook(book: Book, libraryId?: number): Promise<BookOperationResult> {
     const targetLibrary = await this.libraryService.getTargetLibrary(libraryId)
 
-    // Načteme knihovny pro danou knihu
     await book.load('libraries')
+    const isInTargetLibrary = book.libraries.some((library) => library.id === targetLibrary.id)
+    const isInOtherLibrary = book.libraries.some(
+      (library) => library.id !== targetLibrary.id && library.userId === this.auth.user!.id
+    )
 
-    // Zkontrolujeme, zda kniha již není v cílové knihovně
-    const isInLibrary = book.libraries.some((library) => library.id === targetLibrary.id)
+    if (isInOtherLibrary) {
+      return {
+        book: await this.loadBookRelations(book),
+        wasAddedToLibrary: false,
+        existsInOtherLibrary: true,
+      }
+    }
 
-    if (!isInLibrary) {
+    let wasAddedToLibrary = false
+    if (!isInTargetLibrary) {
       await book.related('libraries').attach([targetLibrary.id])
+      wasAddedToLibrary = true
     }
 
     await this.setBookStatus(book.id, OwnershipStatus.OWNED)
-    return await this.loadBookRelations(book)
+    return {
+      book: await this.loadBookRelations(book),
+      wasAddedToLibrary,
+      existsInOtherLibrary: false,
+    }
   }
 
-  private async createNewBook(scrapedBook: ScrapedBook, libraryId?: number): Promise<Book> {
+  private async createNewBook(
+    scrapedBook: ScrapedBook,
+    libraryId?: number
+  ): Promise<BookOperationResult> {
     const targetLibrary = await this.libraryService.getTargetLibrary(libraryId)
     const authorIds = await this.authorService.createAuthors(scrapedBook.authors)
 
@@ -54,10 +77,14 @@ export class BookService {
     await this.setBookStatus(book.id, OwnershipStatus.OWNED)
     await book.related('libraries').attach([targetLibrary.id])
 
-    return await this.loadBookRelations(book)
+    return {
+      book: await this.loadBookRelations(book),
+      wasAddedToLibrary: true,
+      existsInOtherLibrary: false,
+    }
   }
 
-  private async createBookFromEan(ean: number, libraryId?: number): Promise<Book> {
+  private async createBookFromEan(ean: number, libraryId?: number): Promise<BookOperationResult> {
     const savedBook = await Book.findBy('ean', ean)
     if (savedBook) {
       return await this.handleExistingBook(savedBook, libraryId)
@@ -76,7 +103,7 @@ export class BookService {
     throw error
   }
 
-  async createFromEan(ean: number, libraryId?: number): Promise<Book> {
+  async createFromEan(ean: number, libraryId?: number): Promise<BookOperationResult> {
     try {
       return await this.createBookFromEan(ean, libraryId)
     } catch (error) {
@@ -84,7 +111,7 @@ export class BookService {
     }
   }
 
-  async createFromUrl(url: string, libraryId?: number): Promise<Book> {
+  async createFromUrl(url: string, libraryId?: number): Promise<BookOperationResult> {
     try {
       const ean = await this.scraper.getEanFromUrl(url)
       return await this.createBookFromEan(ean, libraryId)
