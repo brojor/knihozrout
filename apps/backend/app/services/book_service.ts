@@ -10,6 +10,7 @@ import { LibraryService } from '#services/library_service'
 import { AuthorService } from '#services/author_service'
 import env from '#start/env'
 import { DetailsProviderError, EanProviderError } from '@knihozrout/scraper'
+import ReadingState, { ReadingStatus } from '#models/reading_state'
 
 interface BookOperationResult {
   book: Book
@@ -32,6 +33,13 @@ export class BookService {
     return await BookStatus.updateOrCreate({ bookId, userId: this.auth.user!.id }, { status })
   }
 
+  private async setInitialReadingState(bookId: number): Promise<void> {
+    await ReadingState.updateOrCreate(
+      { bookId, userId: this.auth.user!.id },
+      { status: ReadingStatus.UNREAD }
+    )
+  }
+
   private async handleExistingBook(book: Book, libraryId?: number): Promise<BookOperationResult> {
     const targetLibrary = await this.libraryService.getTargetLibrary(libraryId)
 
@@ -52,6 +60,7 @@ export class BookService {
     let wasAddedToLibrary = false
     if (!isInTargetLibrary) {
       await book.related('libraries').attach([targetLibrary.id])
+      await this.setInitialReadingState(book.id)
       wasAddedToLibrary = true
     }
 
@@ -76,6 +85,7 @@ export class BookService {
     await book.related('authors').attach(authorIds)
     await this.setBookStatus(book.id, OwnershipStatus.OWNED)
     await book.related('libraries').attach([targetLibrary.id])
+    await this.setInitialReadingState(book.id)
 
     return {
       book: await this.loadBookRelations(book),
@@ -140,6 +150,7 @@ export class BookService {
     await book.load('authors')
     await book.load('libraries')
     await book.load('bookStatuses')
+    await book.load('readingStates')
     return book
   }
 }
