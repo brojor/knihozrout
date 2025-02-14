@@ -17,6 +17,7 @@ export interface ScrapedBook {
   language?: LanguageCode
   originalLanguage?: LanguageCode
   publisher?: string
+  ean: number
 }
 
 export type PartialScrapedBook = Partial<ScrapedBook>

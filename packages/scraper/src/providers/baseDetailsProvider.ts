@@ -35,7 +35,8 @@ export abstract class BaseDetailsProvider {
       pageCount: this.extractPageCount($),
       publisher: this.extractPublisher($),
       publicationYear: this.extractPublicationYear($),
-      coverImage: this.extractCoverImage($)
+      coverImage: this.extractCoverImage($),
+      ean,
     }
   }
 
