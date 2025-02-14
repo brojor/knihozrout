@@ -118,3 +118,4 @@ export class BookScraper {
 export default BookScraper
 
 export { EanProviderError, DetailsProviderError, ScraperError } from './errors/scraperError.js' 
+export { ScrapedBook } from './types/book.js'

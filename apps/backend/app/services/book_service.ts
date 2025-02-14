@@ -2,7 +2,7 @@ import Book from '#models/book'
 import BookStatus from '#models/book_status'
 import { OwnershipStatus } from '#models/book_status'
 import { HttpContext } from '@adonisjs/core/http'
-import BookScraper from '@knihozrout/scraper'
+import BookScraper, { ScrapedBook } from '@knihozrout/scraper'
 import { createBookValidator } from '#validators/book'
 import FailedEanLookup from '#models/failed_ean_lookup'
 import FailedUrlLookup from '#models/failed_url_lookup'
@@ -28,14 +28,22 @@ export class BookService {
 
   private async handleExistingBook(book: Book, libraryId?: number): Promise<Book> {
     const targetLibrary = await this.libraryService.getTargetLibrary(libraryId)
-    await this.setBookStatus(book.id, OwnershipStatus.OWNED)
-    await book.related('libraries').attach([targetLibrary.id])
-    await book.load('authors')
 
-    return book
+    // Načteme knihovny pro danou knihu
+    await book.load('libraries')
+
+    // Zkontrolujeme, zda kniha již není v cílové knihovně
+    const isInLibrary = book.libraries.some((library) => library.id === targetLibrary.id)
+
+    if (!isInLibrary) {
+      await book.related('libraries').attach([targetLibrary.id])
+    }
+
+    await this.setBookStatus(book.id, OwnershipStatus.OWNED)
+    return await this.loadBookRelations(book)
   }
 
-  private async createNewBook(scrapedBook: any, libraryId?: number): Promise<Book> {
+  private async createNewBook(scrapedBook: ScrapedBook, libraryId?: number): Promise<Book> {
     const targetLibrary = await this.libraryService.getTargetLibrary(libraryId)
     const authorIds = await this.authorService.createAuthors(scrapedBook.authors)
 
@@ -45,9 +53,8 @@ export class BookService {
     await book.related('authors').attach(authorIds)
     await this.setBookStatus(book.id, OwnershipStatus.OWNED)
     await book.related('libraries').attach([targetLibrary.id])
-    await book.load('authors')
 
-    return book
+    return await this.loadBookRelations(book)
   }
 
   private async createBookFromEan(ean: number, libraryId?: number): Promise<Book> {
@@ -100,5 +107,12 @@ export class BookService {
       userId: this.auth.user!.id,
       error,
     })
+  }
+
+  private async loadBookRelations(book: Book): Promise<Book> {
+    await book.load('authors')
+    await book.load('libraries')
+    await book.load('bookStatuses')
+    return book
   }
 }
