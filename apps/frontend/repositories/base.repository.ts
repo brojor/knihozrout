@@ -31,23 +31,7 @@ export class BaseRepository {
     })
   }
 
-  protected async call<T>(endpoint: string, options?: ApiRequestOptions): Promise<ApiResponse<T>> {
-    try {
-      const response = await this.api<T>(endpoint, options)
-      return { data: response }
-    }
-    catch (error) {
-      if (error instanceof Error) {
-        const adonisError = error as unknown as AdonisError
-        return {
-          data: null,
-          error: adonisError.message || 'Došlo k chybě při komunikaci se serverem',
-        }
-      }
-      return {
-        data: null,
-        error: 'Došlo k neznámé chybě',
-      }
-    }
+  protected call<T>(endpoint: string, options?: ApiRequestOptions): Promise<T> {
+    return this.api<T>(endpoint, options)
   }
 }

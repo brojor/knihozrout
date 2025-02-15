@@ -25,26 +25,14 @@ export const useAuthStore = defineStore('auth', {
 
     async login(credentials: LoginCredentials) {
       const authRepository = new AuthRepository()
-      const { data, error } = await authRepository.login(credentials)
-
-      if (error)
-        throw new Error(error)
-      if (!data)
-        throw new Error('No data returned from login')
-
-      this.setAuth(data)
+      const response = await authRepository.login(credentials)
+      this.setAuth(response)
     },
 
     async register(credentials: RegisterCredentials) {
       const authRepository = new AuthRepository()
-      const { data, error } = await authRepository.register(credentials)
-
-      if (error)
-        throw new Error(error)
-      if (!data)
-        throw new Error('No data returned from register')
-
-      this.setAuth(data)
+      const response = await authRepository.register(credentials)
+      this.setAuth(response)
     },
 
     async logout() {

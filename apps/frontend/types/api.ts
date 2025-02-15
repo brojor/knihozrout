@@ -10,11 +10,6 @@ export interface ApiRequestOptions extends RequestInit {
   query?: Record<string, string>
 }
 
-export interface ApiError {
-  status: number
-  message: string
-}
-
 export interface AdonisError {
   message: string
   status: number

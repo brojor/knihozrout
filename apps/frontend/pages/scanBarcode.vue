@@ -33,15 +33,15 @@ async function fetchBookByEAN() {
   }
 
   const bookRepository = new BookRepository()
-  const { data, error } = await bookRepository.fetchBookByEAN(scanResult.value)
 
-  if (error)
-    throw new Error(error)
-  if (!data)
-    throw new Error('No data returned from getBookByEAN')
-
-  booksStore.setCurrentBook(data)
-  router.push(`/book/${data.id}`)
+  try {
+    const data = await bookRepository.fetchBookByEAN(scanResult.value)
+    booksStore.setCurrentBook(data)
+    router.push(`/book/${data.id}`)
+  }
+  catch (error) {
+    console.error('Chyba při získávání knihy:', error)
+  }
 }
 
 watch(scanResult, (newVal) => {
