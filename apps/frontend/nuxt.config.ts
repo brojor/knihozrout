@@ -2,6 +2,9 @@
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@pinia/nuxt'],
   ssr: false,
+  imports: {
+    dirs: ['types', 'repositories'],
+  },
   devtools: { enabled: true },
   runtimeConfig: {
     public: {

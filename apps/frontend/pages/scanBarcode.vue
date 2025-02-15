@@ -32,22 +32,16 @@ async function fetchBookByEAN() {
     return
   }
 
-  try {
-    const response = await useApi().fetchBookByEAN(scanResult.value)
-    book.value = response
-    booksStore.setCurrentBook(response)
-    router.push(`/book/${response.id}`)
-  }
-  catch (error) {
-    const err = error as { response?: { status: number, _data?: { error?: string } } }
+  const bookRepository = new BookRepository()
+  const { data, error } = await bookRepository.fetchBookByEAN(scanResult.value)
 
-    console.error('Status kód:', err.response?.status)
-    console.error('Chybová zpráva:', err.response?._data?.error)
-    errors.value.push(`${err.response?.status}: ${err.response?._data?.error}` || 'Neznámá chyba')
-  }
-  finally {
-    isLoading.value = false
-  }
+  if (error)
+    throw new Error(error)
+  if (!data)
+    throw new Error('No data returned from getBookByEAN')
+
+  booksStore.setCurrentBook(data)
+  router.push(`/book/${data.id}`)
 }
 
 watch(scanResult, (newVal) => {
