@@ -1,14 +1,15 @@
 [ ] FE: Použít @tanstack/vue-virtual se sticky headers pro globální hledání
 [ ] Scraper: Zlepšit výkon pomocí parallelního provádění requestů
 [ ] Scraper: Implementovat googleapis.com/books/
-[ ] FE: Použít layouts pro hlavní screeny a subscreeny
+[X] FE: Použít layouts pro hlavní screeny 
+[ ] FE: Použít layouts pro subscreeny
 [X] FE: Zlepšit implementaci API
 [ ] FE: Implementovat horizontalní scroll se snapingem
 [ ] FE: Implementovat offline mode
 [ ] Zajistit konzistentí barevné akcenty napříč UI
 [X] FE: Sledovat bundle size
 [X] FE: Přidat UnoCSS
-[ ] FE: Přidat Vuetify 3
+[X] FE: Přidat Vuetify 3
 
 [ ] FE: Sloučit wishlist a library do jedné stránky
     [ ] Vytvořit výrazný segment control v horní části stránky

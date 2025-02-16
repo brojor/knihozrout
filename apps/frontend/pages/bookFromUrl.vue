@@ -6,7 +6,7 @@ const router = useRouter()
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 const booksStore = useBooksStore()
-
+const bookRepository = new BookRepository()
 async function fetchBookFromUrl() {
   const url = route.query.url as string
 
@@ -16,7 +16,7 @@ async function fetchBookFromUrl() {
   }
 
   try {
-    const response = await useApi().fetchBookFromUrl(url)
+    const response = await bookRepository.fetchBookFromUrl(url)
     booksStore.setCurrentBook(response)
     router.push(`/book/${response.id}`)
   }
