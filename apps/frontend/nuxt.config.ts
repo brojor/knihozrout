@@ -12,6 +12,9 @@ export default defineNuxtConfig({
       baseUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3333',
     },
   },
+  build: {
+    analyze: true,
+  },
   compatibilityDate: '2024-11-01',
   eslint: {
     config: {

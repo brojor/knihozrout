@@ -11,7 +11,8 @@
     "lint:fix": "eslint . --fix",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "analyze-bundle": "nuxt generate && node scripts/save-bundle-analysis.js"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.1",
