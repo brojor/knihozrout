@@ -1,3 +1,5 @@
+import vuetify from 'vite-plugin-vuetify'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@pinia/nuxt', '@unocss/nuxt'],
@@ -6,6 +8,7 @@ export default defineNuxtConfig({
     dirs: ['types', 'repositories'],
   },
   devtools: { enabled: true },
+  css: ['@mdi/font/css/materialdesignicons.css'],
   runtimeConfig: {
     public: {
       // eslint-disable-next-line node/prefer-global/process
@@ -14,8 +17,14 @@ export default defineNuxtConfig({
   },
   build: {
     analyze: true,
+    transpile: ['vuetify'],
   },
   compatibilityDate: '2024-11-01',
+  hooks: {
+    'vite:extendConfig': (config) => {
+      config.plugins!.push(vuetify())
+    },
+  },
   eslint: {
     config: {
       stylistic: true,
