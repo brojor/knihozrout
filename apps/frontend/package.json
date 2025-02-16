@@ -27,7 +27,9 @@
     "@capacitor/cli": "^7.0.1",
     "@nuxt/eslint": "^1.0.0",
     "@pinia/nuxt": "^0.9.0",
+    "@unocss/nuxt": "^65.5.0",
     "eslint": "^9.19.0",
-    "typescript": "~5.7"
+    "typescript": "~5.7",
+    "unocss": "^65.5.0"
   }
 }

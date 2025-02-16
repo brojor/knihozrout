@@ -7,6 +7,8 @@
 [ ] FE: Implementovat offline mode
 [ ] Zajistit konzistentí barevné akcenty napříč UI
 [X] FE: Sledovat bundle size
+[X] FE: Přidat UnoCSS
+[ ] FE: Přidat Vuetify 3
 
 [ ] FE: Sloučit wishlist a library do jedné stránky
     [ ] Vytvořit výrazný segment control v horní části stránky
