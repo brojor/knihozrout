@@ -25,7 +25,7 @@ export class BaseRepository {
         if (response.status === 401) {
           const auth = useAuthStore()
           auth.clearAuth()
-          navigateTo('/login')
+          navigateTo('/auth')
         }
       },
     })

@@ -1,11 +1,11 @@
 export default defineNuxtRouteMiddleware((to) => {
   const { isAuthenticated } = useAuthStore()
 
-  if (!isAuthenticated && to.path !== '/login') {
-    return navigateTo('/login')
+  if (!isAuthenticated && to.path !== '/auth') {
+    return navigateTo('/auth')
   }
 
-  if (isAuthenticated && to.path === '/login') {
+  if (isAuthenticated && to.path === '/auth') {
     return navigateTo('/')
   }
 })
