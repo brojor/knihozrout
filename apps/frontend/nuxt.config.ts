@@ -8,6 +8,12 @@ export default defineNuxtConfig({
     dirs: ['types', 'repositories'],
   },
   devtools: { enabled: true },
+  app: {
+    pageTransition: {
+      name: 'page',
+      mode: 'out-in',
+    },
+  },
   css: ['@mdi/font/css/materialdesignicons.css'],
   runtimeConfig: {
     public: {

@@ -10,6 +10,7 @@
 [X] FE: Sledovat bundle size
 [X] FE: Přidat UnoCSS
 [X] FE: Přidat Vuetify 3
+[X] FE: Animovat přechody mezi hlavními screeny
 
 [ ] FE: Sloučit wishlist a library do jedné stránky
     [ ] Vytvořit výrazný segment control v horní části stránky
