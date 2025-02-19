@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { AUTH_TEXTS } from '~/constants/auth'
-
 definePageMeta({
   layout: 'auth',
 })
@@ -14,8 +12,6 @@ const {
   toggleMode,
   handleSubmit,
 } = useAuthForm()
-
-const { inputs } = AUTH_TEXTS
 </script>
 
 <template>
@@ -29,62 +25,13 @@ const { inputs } = AUTH_TEXTS
       </p>
     </header>
 
-    <form
-      class="space-y-6 mt-12"
-      :aria-label="texts.formLabel"
-      @submit.prevent="handleSubmit"
-    >
-      <div class="space-y-4">
-        <AuthInput
-          v-if="!isLogin"
-          id="fullName"
-          v-model="form.fullName"
-          :label="inputs.fullName"
-          :error="errors.fullName"
-          autocomplete="name"
-        />
-
-        <AuthInput
-          id="email"
-          v-model="form.email"
-          type="email"
-          :label="inputs.email"
-          :error="errors.email"
-          autocomplete="email"
-        />
-
-        <AuthInput
-          id="password"
-          v-model="form.password"
-          :label="inputs.password"
-          :error="errors.password"
-          :autocomplete="isLogin ? 'current-password' : 'new-password'"
-          is-password-field
-        />
-
-        <!-- Forgot password link -->
-        <div v-if="isLogin" class="text-right">
-          <a
-            href="#"
-            class="text-sm underline"
-            aria-label="Obnovit zapomenuté heslo"
-          >
-            {{ AUTH_TEXTS.forgotPassword }}
-          </a>
-        </div>
-      </div>
-
-      <!-- Submit button -->
-      <button
-        type="submit"
-        class="w-full h-14 text-lg font-semibold rounded-xl bg-white text-gray-900 active:bg-gray-100"
-        :class="{ 'opacity-75': isLoading }"
-        :aria-busy="isLoading"
-        :disabled="isLoading"
-      >
-        {{ texts.submitButton }}
-      </button>
-    </form>
+    <AuthForm
+      v-model:form="form"
+      :is-login="isLogin"
+      :is-loading="isLoading"
+      :errors="errors"
+      @submit="handleSubmit"
+    />
 
     <div class="flex flex-1 justify-center items-center my-4">
       <img

@@ -17,7 +17,9 @@ const props = withDefaults(defineProps<Props>(), {
   isPasswordField: false,
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+}>()
 
 // Pro pole typu heslo
 const showPassword = ref(false)
