@@ -1,7 +1,7 @@
 export const AUTH_TEXTS = {
   login: {
     title: 'Vítej zpět,',
-    subtitle: 'tvoje knihovna na tebe čeká',
+    subtitle: 'tvoje knihovna na tebe čeká!',
     submitButton: 'Přihlásit se',
     togglePrompt: 'Nemáš účet?',
     toggleAction: 'Zaregistruj se',
@@ -10,7 +10,7 @@ export const AUTH_TEXTS = {
   },
   register: {
     title: 'Vítej mezi námi,',
-    subtitle: 'založíme ti knihovnu',
+    subtitle: 'založíme ti knihovnu!',
     submitButton: 'Vytvořit účet',
     togglePrompt: 'Už máš účet?',
     toggleAction: 'Přihlaš se',

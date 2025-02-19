@@ -78,7 +78,9 @@ const { inputs } = AUTH_TEXTS
       <button
         type="submit"
         class="w-full h-14 text-lg font-semibold rounded-xl bg-white text-gray-900 active:bg-gray-100"
+        :class="{ 'opacity-75': isLoading }"
         :aria-busy="isLoading"
+        :disabled="isLoading"
       >
         {{ texts.submitButton }}
       </button>

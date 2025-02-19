@@ -64,7 +64,7 @@ const inputType = computed(() => {
     <div
       v-if="error"
       :id="`${id}-error`"
-      class="text-red-700 text-sm mt-1"
+      class="text-red-700 text-sm mt-1 -mb-2"
       role="alert"
     >
       {{ error }}
