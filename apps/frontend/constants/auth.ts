@@ -6,7 +6,7 @@ export const AUTH_TEXTS = {
     togglePrompt: 'Nemáš účet?',
     toggleAction: 'Zaregistruj se',
     formLabel: 'Přihlášení',
-
+    loading: 'Přihlašuji se...',
   },
   register: {
     title: 'Vítej mezi námi,',
@@ -15,6 +15,7 @@ export const AUTH_TEXTS = {
     togglePrompt: 'Už máš účet?',
     toggleAction: 'Přihlaš se',
     formLabel: 'Registrace',
+    loading: 'Vytvářím účet...',
   },
   inputs: {
     fullName: 'Jméno a příjmení',

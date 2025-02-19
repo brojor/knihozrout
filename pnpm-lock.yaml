@@ -135,6 +135,9 @@ importers:
       '@iconify-json/clarity':
         specifier: ^1.2.2
         version: 1.2.2
+      '@iconify-json/svg-spinners':
+        specifier: ^1.2.2
+        version: 1.2.2
       '@mdi/font':
         specifier: ^7.4.47
         version: 7.4.47
@@ -1014,6 +1017,9 @@ packages:
 
   '@iconify-json/clarity@1.2.2':
     resolution: {integrity: sha512-ShZVAWkcI/OYQSBdGPYKjyCrT1ApACYrenPmWD8VJKY8KGip+tSe0qv1c8+Jsfou8Jx71XS7x+rJQC1ydRygIA==}
+
+  '@iconify-json/svg-spinners@1.2.2':
+    resolution: {integrity: sha512-DIErwfBWWzLfmAG2oQnbUOSqZhDxlXvr8941itMCrxQoMB0Hiv8Ww6Bln/zIgxwjDvSem2dKJtap+yKKwsB/2A==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -7689,6 +7695,10 @@ snapshots:
   '@humanwhocodes/retry@0.4.1': {}
 
   '@iconify-json/clarity@1.2.2':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/svg-spinners@1.2.2':
     dependencies:
       '@iconify/types': 2.0.0
 

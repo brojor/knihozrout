@@ -25,12 +25,15 @@ const localForm = computed({
 })
 
 const { inputs } = AUTH_TEXTS
+const texts = computed(() => {
+  return props.isLogin ? AUTH_TEXTS.login : AUTH_TEXTS.register
+})
 </script>
 
 <template>
   <form
     class="space-y-6 mt-12"
-    :aria-label="isLogin ? 'Přihlášení' : 'Registrace'"
+    :aria-label="texts.formLabel"
     @submit.prevent="$emit('submit')"
   >
     <div
@@ -91,7 +94,13 @@ const { inputs } = AUTH_TEXTS
       :aria-busy="isLoading"
       :disabled="isLoading"
     >
-      {{ isLogin ? 'Přihlásit se' : 'Vytvořit účet' }}
+      <template v-if="isLoading">
+        <div class="i-svg-spinners:180-ring mr-2" />
+        {{ texts.loading }}
+      </template>
+      <template v-else>
+        {{ texts.submitButton }}
+      </template>
     </button>
   </form>
 </template>
