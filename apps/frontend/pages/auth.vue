@@ -1,77 +1,37 @@
 <script setup lang="ts">
-import { z } from 'zod'
-import { loginSchema, registerSchema } from '~/validation/auth'
+import { AUTH_TEXTS } from '~/constants/auth'
 
 definePageMeta({
   layout: 'auth',
 })
 
-const authStore = useAuthStore()
-const router = useRouter()
+const {
+  form,
+  isLogin,
+  isLoading,
+  errors,
+  texts,
+  toggleMode,
+  handleSubmit,
+} = useAuthForm()
 
-const isLogin = ref(true)
-const isLoading = ref(false)
-const form = reactive({
-  email: '',
-  password: '',
-  fullName: '',
-})
-
-const { errors, handleBackendError, clearErrors } = useAuthForm()
-
-function toggleMode() {
-  isLogin.value = !isLogin.value
-}
-
-async function handleSubmit() {
-  clearErrors()
-  isLoading.value = true
-
-  try {
-    const schema = isLogin.value ? loginSchema : registerSchema
-    await schema.parseAsync(form)
-
-    if (isLogin.value) {
-      await authStore.login(form)
-    }
-    else {
-      await authStore.register(form)
-    }
-    await router.push('/')
-  }
-  catch (e) {
-    if (e instanceof z.ZodError) {
-      // Zod validační chyby
-      errors.value = e.errors.reduce((acc: Record<string, string>, curr) => {
-        acc[curr.path[0]] = curr.message
-        return acc
-      }, {})
-    }
-    else {
-      // Backend chyby
-      handleBackendError(e)
-    }
-  }
-  finally {
-    isLoading.value = false
-  }
-}
+const { inputs } = AUTH_TEXTS
 </script>
 
 <template>
   <main class="min-h-[100dvh] flex-1 bg-gradient-to-br from-[#F19A5E] to-[#EC6D59] text-white p-6 flex flex-col">
     <header class="space-y-4">
       <h1 id="page-title" class="text-4xl font-bold">
-        {{ isLogin ? 'Vítej zpět,' : 'Vítej mezi námi,' }}
+        {{ texts.title }}
       </h1>
       <p class="text-xl font-400">
-        {{ isLogin ? 'tvoje knihovna na tebe čeká' : 'založíme ti knihovnu' }}
+        {{ texts.subtitle }}
       </p>
     </header>
 
     <form
       class="space-y-6 mt-12"
-      :aria-label=" isLogin ? 'Přihlášení' : 'Registrace' "
+      :aria-label="texts.formLabel"
       @submit.prevent="handleSubmit"
     >
       <div class="space-y-4">
@@ -79,7 +39,7 @@ async function handleSubmit() {
           v-if="!isLogin"
           id="fullName"
           v-model="form.fullName"
-          label="Jméno a příjmení"
+          :label="inputs.fullName"
           :error="errors.fullName"
           autocomplete="name"
         />
@@ -88,7 +48,7 @@ async function handleSubmit() {
           id="email"
           v-model="form.email"
           type="email"
-          label="E-mailová adresa"
+          :label="inputs.email"
           :error="errors.email"
           autocomplete="email"
         />
@@ -96,7 +56,7 @@ async function handleSubmit() {
         <AuthInput
           id="password"
           v-model="form.password"
-          label="Heslo"
+          :label="inputs.password"
           :error="errors.password"
           :autocomplete="isLogin ? 'current-password' : 'new-password'"
           is-password-field
@@ -109,7 +69,7 @@ async function handleSubmit() {
             class="text-sm underline"
             aria-label="Obnovit zapomenuté heslo"
           >
-            Zapomněl/a jsi heslo?
+            {{ AUTH_TEXTS.forgotPassword }}
           </a>
         </div>
       </div>
@@ -120,7 +80,7 @@ async function handleSubmit() {
         class="w-full h-14 text-lg font-semibold rounded-xl bg-white text-gray-900 active:bg-gray-100"
         :aria-busy="isLoading"
       >
-        {{ isLogin ? 'Přihlásit se' : 'Vytvořit účet' }}
+        {{ texts.submitButton }}
       </button>
     </form>
 
@@ -135,13 +95,13 @@ async function handleSubmit() {
 
     <footer class="text-center">
       <p class="text-white">
-        {{ isLogin ? "Nemáš účet?" : 'Už máš účet?' }}
+        {{ texts.togglePrompt }}
         <button
           class="font-semibold ml-1 underline"
           type="button"
           @click="toggleMode"
         >
-          {{ isLogin ? 'Zaregistruj se' : 'Přihlaš se' }}
+          {{ texts.toggleAction }}
         </button>
       </p>
     </footer>
