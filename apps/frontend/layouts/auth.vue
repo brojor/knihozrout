@@ -1,6 +1,4 @@
-// layouts/auth.vue
 <template>
-  <div class="min-h-[100dvh] flex">
-    <slot />
-  </div>
+  <!-- eslint-disable-next-line vue/no-multiple-template-root -->
+  <slot />
 </template>

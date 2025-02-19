@@ -1,4 +1,4 @@
-import { defineConfig, presetIcons, presetUno } from 'unocss'
+import { defineConfig, presetIcons, presetUno, presetWebFonts } from 'unocss'
 
 export default defineConfig({
   presets: [
@@ -10,6 +10,17 @@ export default defineConfig({
         'vertical-align': 'middle',
       },
     }),
+    presetWebFonts({
+      customFetch: (url) => {
+        return fetch(url).then(res => res.text())
+      },
+      fonts: {
+        sans: {
+          name: 'Inter',
+          weights: ['400', '500', '700'],
+        },
+      },
+    }),
     // ...other presets
   ],
   theme: {
@@ -17,4 +28,5 @@ export default defineConfig({
       'base-gray': '#4B5563',
     },
   },
+  safelist: ['font-sans'],
 })

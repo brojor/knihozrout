@@ -14,7 +14,7 @@ export default defineNuxtConfig({
       mode: 'out-in',
     },
   },
-  css: ['@mdi/font/css/materialdesignicons.css'],
+  css: ['@mdi/font/css/materialdesignicons.css', '@unocss/reset/tailwind.css'],
   runtimeConfig: {
     public: {
       // eslint-disable-next-line node/prefer-global/process
