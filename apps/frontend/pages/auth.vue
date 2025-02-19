@@ -8,6 +8,7 @@ const {
   isLogin,
   isLoading,
   errors,
+  generalError,
   texts,
   toggleMode,
   handleSubmit,
@@ -30,6 +31,7 @@ const {
       :is-login="isLogin"
       :is-loading="isLoading"
       :errors="errors"
+      :general-error="generalError"
       @submit="handleSubmit"
     />
 

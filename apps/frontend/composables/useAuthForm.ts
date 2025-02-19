@@ -7,6 +7,7 @@ export function useAuthForm() {
   const authStore = useAuthStore()
   const router = useRouter()
   const errors = ref<Record<string, string>>({})
+  const generalError = ref<string>('')
   const isLogin = ref(true)
   const isLoading = ref(false)
 
@@ -17,6 +18,11 @@ export function useAuthForm() {
   })
 
   function handleBackendError(error: any) {
+    if (error.response?.status === 401) {
+      generalError.value = error.response._data.message
+      return
+    }
+
     if (error.response?.status === 409) {
       errors.value.email = error.response._data.message
       return
@@ -40,6 +46,7 @@ export function useAuthForm() {
 
   function clearErrors() {
     errors.value = {}
+    generalError.value = ''
   }
 
   function toggleMode() {
@@ -82,6 +89,7 @@ export function useAuthForm() {
     isLogin,
     isLoading,
     errors,
+    generalError,
     texts,
     toggleMode,
     handleSubmit,

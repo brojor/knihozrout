@@ -10,6 +10,7 @@ const props = defineProps<{
     email: string
     password: string
   }
+  generalError?: string
 }>()
 
 const emit = defineEmits<{
@@ -32,6 +33,16 @@ const { inputs } = AUTH_TEXTS
     :aria-label="isLogin ? 'Přihlášení' : 'Registrace'"
     @submit.prevent="$emit('submit')"
   >
+    <div
+      v-if="generalError"
+      class="text-red-700 text-center font-semibold text-sm"
+      role="alert"
+    >
+      <div class="i-clarity:warning-solid mb-[2px]" />
+      {{ generalError }}
+      <div class="i-clarity:warning-solid mb-[2px]" />
+    </div>
+
     <div class="space-y-4">
       <AuthInput
         v-if="!isLogin"
