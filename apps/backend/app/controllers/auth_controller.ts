@@ -10,7 +10,7 @@ export default class AuthController {
     // Kontrola existence emailu
     const existingUser = await User.findBy('email', data.email)
     if (existingUser) {
-      return response.conflict({ message: 'Email již existuje' })
+      return response.conflict({ message: 'Uživatel s tímto emailem již existuje' })
     }
 
     // Vytvoření uživatele

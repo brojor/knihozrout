@@ -20,3 +20,12 @@ export interface AdonisError {
     message: string
   }[]
 }
+
+export interface ValidationError {
+  errors?: {
+    message: string
+    rule: string
+    field: string
+  }[]
+  message?: string
+}
