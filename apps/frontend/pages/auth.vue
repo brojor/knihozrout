@@ -10,7 +10,6 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const isLogin = ref(true)
-const showPassword = ref(false)
 const isLoading = ref(false)
 const form = reactive({
   email: '',
@@ -76,104 +75,32 @@ async function handleSubmit() {
       @submit.prevent="handleSubmit"
     >
       <div class="space-y-4">
-        <!-- Full name field -->
-        <div v-if="!isLogin" class="form-group">
-          <label id="fullName-label" for="fullName" class="block mb-2 sr-only">
-            Jméno a příjmení
-          </label>
-          <input
-            id="fullName"
-            v-model="form.fullName"
-            type="text"
-            name="fullName"
-            placeholder="Jméno a příjmení"
-            class="h-14 px-6 rounded-xl bg-white:30 placeholder-white w-full"
-            :class="{ 'ring-1 ring-red-700': errors.fullName }"
-            required
-            autocomplete="name"
-            aria-describedby="fullName-label"
-            :aria-invalid="!!errors.fullName"
-            :aria-errormessage="errors.fullName ? 'fullName-error' : undefined"
-          >
-          <div
-            v-if="errors.fullName"
-            id="fullName-error"
-            class="text-red-700 text-sm mt-1"
-            role="alert"
-          >
-            {{ errors.fullName }}
-          </div>
-        </div>
+        <AuthInput
+          v-if="!isLogin"
+          id="fullName"
+          v-model="form.fullName"
+          label="Jméno a příjmení"
+          :error="errors.fullName"
+          autocomplete="name"
+        />
 
-        <!-- Email field -->
-        <div class="form-group">
-          <label id="email-label" for="email" class="block mb-2 sr-only">
-            E-mailová adresa
-          </label>
-          <input
-            id="email"
-            v-model="form.email"
-            type="email"
-            name="email"
-            placeholder="E-mailová adresa"
-            class="h-14 px-6 rounded-xl bg-white:30 placeholder-white w-full"
-            :class="{ 'ring-1 ring-red-700': errors.email }"
-            required
-            autocomplete="email"
-            aria-describedby="email-label"
-            :aria-invalid="!!errors.email"
-            :aria-errormessage="errors.email ? 'email-error' : undefined"
-          >
-          <div
-            v-if="errors.email"
-            id="email-error"
-            class="text-red-700 text-sm mt-1"
-            role="alert"
-          >
-            {{ errors.email }}
-          </div>
-        </div>
+        <AuthInput
+          id="email"
+          v-model="form.email"
+          type="email"
+          label="E-mailová adresa"
+          :error="errors.email"
+          autocomplete="email"
+        />
 
-        <!-- Password field -->
-        <div class="form-group">
-          <label id="password-label" for="password" class="block mb-2 sr-only">
-            Heslo
-          </label>
-          <div class="relative">
-            <input
-              id="password"
-              v-model="form.password"
-              :type="showPassword ? 'text' : 'password'"
-              name="password"
-              placeholder="Heslo"
-              class="h-14 px-6 rounded-xl bg-white:30 placeholder-white w-full pr-14"
-              :class="{ 'ring-1 ring-red-700': errors.password }"
-              required
-              :autocomplete="isLogin ? 'current-password' : 'new-password'"
-              aria-describedby="password-label"
-              :aria-invalid="!!errors.password"
-              :aria-errormessage="errors.password ? 'password-error' : undefined"
-            >
-            <button
-              type="button"
-              class="absolute right-4 top-1/2 -translate-y-1/2"
-              :aria-label="showPassword ? 'Skrýt heslo' : 'Zobrazit heslo'"
-              :aria-pressed="showPassword"
-              @click="showPassword = !showPassword"
-            >
-              <div v-if="showPassword" class="i-clarity:eye-line" aria-hidden="true" />
-              <div v-else class="i-clarity:eye-hide-line" aria-hidden="true" />
-            </button>
-          </div>
-          <div
-            v-if="errors.password"
-            id="password-error"
-            class="text-red-700 text-sm mt-1"
-            role="alert"
-          >
-            {{ errors.password }}
-          </div>
-        </div>
+        <AuthInput
+          id="password"
+          v-model="form.password"
+          label="Heslo"
+          :error="errors.password"
+          :autocomplete="isLogin ? 'current-password' : 'new-password'"
+          is-password-field
+        />
 
         <!-- Forgot password link -->
         <div v-if="isLogin" class="text-right">
