@@ -1,6 +1,8 @@
 <script setup lang="ts">
+const router = useRouter()
+
 function scan() {
-  console.log('scan')
+  router.push('/scanBarcode')
 }
 
 function manual() {

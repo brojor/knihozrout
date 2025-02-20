@@ -1,25 +1,23 @@
 <script lang="ts" setup>
 import { CapacitorBarcodeScanner, CapacitorBarcodeScannerTypeHint } from '@capacitor/barcode-scanner'
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
 
 const scanResult = ref<number | null>(null)
-const book = ref<any | null>(null)
 const isLoading = ref(false)
-const errors = ref<string[]>([])
 const router = useRouter()
 const booksStore = useBooksStore()
 
 async function startScanning() {
-  errors.value = []
   try {
     const { ScanResult } = await CapacitorBarcodeScanner.scanBarcode({
       hint: CapacitorBarcodeScannerTypeHint.EAN_13,
       scanInstructions: 'Naskenujte čárový kód knihy',
     })
+    await Haptics.impact({ style: ImpactStyle.Light })
     scanResult.value = Number.parseInt(ScanResult)
   }
   catch (error) {
     console.error('Chyba při skenování:', error)
-    errors.value.push(`Chyba při skenování: ${error}`)
   }
 }
 
@@ -28,7 +26,6 @@ async function fetchBookByEAN() {
 
   if (!scanResult.value) {
     console.error('Žádný čárový kód nebyl naskenován')
-    errors.value.push('Žádný čárový kód nebyl naskenován')
     return
   }
 
@@ -41,6 +38,9 @@ async function fetchBookByEAN() {
   }
   catch (error) {
     console.error('Chyba při získávání knihy:', error)
+  }
+  finally {
+    isLoading.value = false
   }
 }
 
@@ -58,28 +58,10 @@ onMounted(() => {
 <template>
   <div>
     <h1>Skenování čárového kódu</h1>
-    <!-- spinning loader with text "Prohledávám internet" -->
     <div v-if="isLoading" class="scan-barcode">
       <p>Prohledávám internet</p>
       <div class="loader" />
     </div>
-
-    <!-- show book details -->
-    <div v-else-if="book">
-      <pre>
-            <code>
-                {{ JSON.stringify(book, null, 2) }}
-            </code>
-        </pre>
-    </div>
-    <ul v-if="errors.length > 0" class="errors">
-      <li v-for="error in errors" :key="error">
-        {{ error }}
-      </li>
-    </ul>
-    <button @click="startScanning">
-      Skenovat znovu
-    </button>
   </div>
 </template>
 
@@ -89,12 +71,6 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-button {
-    margin: 16px 0;
-    padding: 12px 24px;
-    font-size: 16px;
-    cursor: pointer;
 }
 
 .loader {
@@ -109,9 +85,5 @@ button {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-.errors {
-  color: red;
 }
 </style>

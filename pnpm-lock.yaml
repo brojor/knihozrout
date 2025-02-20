@@ -107,6 +107,9 @@ importers:
       '@capacitor/core':
         specifier: ^7.0.1
         version: 7.0.1
+      '@capacitor/haptics':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.0.1)
       '@unocss/reset':
         specifier: ^65.5.0
         version: 65.5.0
@@ -605,6 +608,11 @@ packages:
 
   '@capacitor/core@7.0.1':
     resolution: {integrity: sha512-1Ob9bvA/p8g8aNwK6VesxEekGXowLVf6APjkW4LRnr05H+7z/bke+Q5pn9zqh/GgTbIxAQ/rwZrAZvvxkdm1UA==}
+
+  '@capacitor/haptics@7.0.0':
+    resolution: {integrity: sha512-8uI8rWyAbq8EzkjS+sHZSncyzujHzVbuLKgj8J5H0yUL6+r26F16gVA2iuQuIBvzbSMy7Y0/pUuWlwZr/H8AKg==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
 
   '@chevrotain/cst-dts-gen@11.0.3':
     resolution: {integrity: sha512-BvIKpRLeS/8UbfxXxgC33xOumsacaeCKAjAeLyOn7Pcp95HiRbrpl14S+9vaZLolnbssPIUuiUd8IvgkRyt6NQ==}
@@ -7421,6 +7429,10 @@ snapshots:
   '@capacitor/core@7.0.1':
     dependencies:
       tslib: 2.8.1
+
+  '@capacitor/haptics@7.0.0(@capacitor/core@7.0.1)':
+    dependencies:
+      '@capacitor/core': 7.0.1
 
   '@chevrotain/cst-dts-gen@11.0.3':
     dependencies:
