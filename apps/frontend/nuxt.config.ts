@@ -2,7 +2,7 @@ import vuetify from 'vite-plugin-vuetify'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@pinia/nuxt', '@unocss/nuxt'],
+  modules: ['@nuxt/eslint', '@pinia/nuxt', '@unocss/nuxt', '@vueuse/nuxt'],
   ssr: false,
   imports: {
     dirs: ['types', 'repositories'],
