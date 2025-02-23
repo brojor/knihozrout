@@ -5,6 +5,7 @@ const booksStore = useBooksStore()
 const book = computed(() => booksStore.currentBook)
 const isLoading = ref(!book.value)
 const error = ref<string | null>(null)
+const bookRepository = new BookRepository()
 
 async function fetchBook() {
   if (book.value?.id === Number(route.params.id))
@@ -12,7 +13,7 @@ async function fetchBook() {
 
   try {
     isLoading.value = true
-    const response = await useApi().fetchBook(Number(route.params.id))
+    const response = await bookRepository.fetchBook(Number(route.params.id))
     booksStore.setCurrentBook(response)
   }
   catch (e: any) {

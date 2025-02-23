@@ -1,18 +1,14 @@
 <script setup lang="ts">
 const router = useRouter()
+const notifications = useNotificationsStore()
 
 function scan() {
   router.push('/scanBarcode')
 }
 
 function manual() {
-  console.log('manual')
+  notifications.error('Manual entry not implemented', { duration: 10000 })
 }
-
-// console log viewport size
-onMounted(() => {
-  console.log('viewport size', window.innerWidth, window.innerHeight)
-})
 </script>
 
 <template>

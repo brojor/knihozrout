@@ -17,20 +17,14 @@ export function useAuthForm() {
     fullName: '',
   })
 
-  function handleBackendError(error: any) {
-    if (error.response?.status === 401) {
-      generalError.value = error.response._data.message
+  function handleBackendError(error: ApiError) {
+    if (error.status === 400) {
+      generalError.value = 'Nesprávné přihlašovací údaje'
       return
     }
 
-    if (error.response?.status === 409) {
-      errors.value.email = error.response._data.message
-      return
-    }
-
-    const validationError = error.response?._data as ValidationError
-    if (validationError.errors) {
-      errors.value = validationError.errors.reduce((acc, curr) => {
+    if (error.status === 422) {
+      errors.value = error.errors!.reduce((acc, curr) => {
         acc[curr.field] = curr.message
         return acc
       }, {} as Record<string, string>)
@@ -73,8 +67,11 @@ export function useAuthForm() {
       if (e instanceof z.ZodError) {
         handleZodError(e)
       }
-      else {
+      else if (e instanceof ApiError) {
         handleBackendError(e)
+      }
+      else {
+        throw e
       }
     }
     finally {

@@ -1,31 +1,15 @@
-// types/common.ts
-export interface ApiResponse<T> {
-  data: T | null
-  error?: string
-}
-
-export interface ApiRequestOptions extends RequestInit {
-  headers?: Record<string, string>
-  body?: any
-  query?: Record<string, string>
-}
-
-export interface AdonisError {
+export interface ValidationError {
   message: string
+  rule: string
+  field: string
+  meta?: Record<string, unknown>
+}
+
+export interface ApiErrorResponse {
   status: number
   code: string
-  errors?: {
-    rule: string
-    field: string
-    message: string
-  }[]
+  errors?: ValidationError[]
+  data?: Record<string, unknown>
 }
 
-export interface ValidationError {
-  errors?: {
-    message: string
-    rule: string
-    field: string
-  }[]
-  message?: string
-}
+export type ApiResponse<T> = T | ApiError

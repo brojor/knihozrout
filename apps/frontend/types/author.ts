@@ -2,6 +2,7 @@ export interface Author {
   id: number
   firstName: string
   lastName: string
+  fullName: string
   birthYear: number | null
   deathYear: number | null
   nationality: string | null

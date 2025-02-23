@@ -11,12 +11,8 @@ import { AuthorService } from '#services/author_service'
 import env from '#start/env'
 import { DetailsProviderError, EanProviderError } from '@knihozrout/scraper'
 import ReadingState, { ReadingStatus } from '#models/reading_state'
-
-interface BookOperationResult {
-  book: Book
-  wasAddedToLibrary: boolean
-  existsInOtherLibrary: boolean
-}
+import BookNotFoundException from '#exceptions/book_not_found_exception'
+import BookAlreadyExistsException from '#exceptions/book_already_exists_exception'
 
 export class BookService {
   private libraryService: LibraryService
@@ -40,42 +36,27 @@ export class BookService {
     )
   }
 
-  private async handleExistingBook(book: Book, libraryId?: number): Promise<BookOperationResult> {
+  private async handleExistingBook(book: Book, libraryId?: number): Promise<Book> {
     const targetLibrary = await this.libraryService.getTargetLibrary(libraryId)
 
     await book.load('libraries')
-    const isInTargetLibrary = book.libraries.some((library) => library.id === targetLibrary.id)
-    const isInOtherLibrary = book.libraries.some(
-      (library) => library.id !== targetLibrary.id && library.userId === this.auth.user!.id
-    )
+    const existingLibrary = book.libraries.find((library) => library.userId === this.auth.user!.id)
 
-    if (isInOtherLibrary) {
-      return {
-        book: await this.loadBookRelations(book),
-        wasAddedToLibrary: false,
-        existsInOtherLibrary: true,
-      }
+    if (existingLibrary) {
+      throw new BookAlreadyExistsException('Kniha již existuje v knihovně', {
+        bookId: book.id,
+        libraryId: existingLibrary.id,
+      })
     }
 
-    let wasAddedToLibrary = false
-    if (!isInTargetLibrary) {
-      await book.related('libraries').attach([targetLibrary.id])
-      await this.setInitialReadingState(book.id)
-      wasAddedToLibrary = true
-    }
-
+    await book.related('libraries').attach([targetLibrary.id])
+    await this.setInitialReadingState(book.id)
     await this.setBookStatus(book.id, OwnershipStatus.OWNED)
-    return {
-      book: await this.loadBookRelations(book),
-      wasAddedToLibrary,
-      existsInOtherLibrary: false,
-    }
+
+    return await this.loadBookRelations(book)
   }
 
-  private async createNewBook(
-    scrapedBook: ScrapedBook,
-    libraryId?: number
-  ): Promise<BookOperationResult> {
+  private async createNewBook(scrapedBook: ScrapedBook, libraryId?: number): Promise<Book> {
     const targetLibrary = await this.libraryService.getTargetLibrary(libraryId)
     const authorIds = await this.authorService.createAuthors(scrapedBook.authors)
 
@@ -87,14 +68,10 @@ export class BookService {
     await book.related('libraries').attach([targetLibrary.id])
     await this.setInitialReadingState(book.id)
 
-    return {
-      book: await this.loadBookRelations(book),
-      wasAddedToLibrary: true,
-      existsInOtherLibrary: false,
-    }
+    return await this.loadBookRelations(book)
   }
 
-  private async createBookFromEan(ean: number, libraryId?: number): Promise<BookOperationResult> {
+  private async createBookFromEan(ean: number, libraryId?: number): Promise<Book> {
     const savedBook = await Book.findBy('ean', ean)
     if (savedBook) {
       return await this.handleExistingBook(savedBook, libraryId)
@@ -104,16 +81,20 @@ export class BookService {
     return await this.createNewBook(scrapedBook, libraryId)
   }
 
-  private async handleError(error: unknown, ean?: number, url?: string): Promise<never> {
+  private async handleError(error: any, ean?: number, url?: string): Promise<never> {
+    if (error instanceof BookAlreadyExistsException) {
+      throw error
+    }
+
     if (error instanceof EanProviderError && url) {
       await this.logFailedUrlLookup(url, error.message)
     } else if (error instanceof DetailsProviderError && ean) {
       await this.logFailedEanLookup(ean, error.message)
     }
-    throw error
+    throw new BookNotFoundException('Kniha nenalezena')
   }
 
-  async createFromEan(ean: number, libraryId?: number): Promise<BookOperationResult> {
+  async createFromEan(ean: number, libraryId?: number): Promise<Book> {
     try {
       return await this.createBookFromEan(ean, libraryId)
     } catch (error) {
@@ -121,7 +102,7 @@ export class BookService {
     }
   }
 
-  async createFromUrl(url: string, libraryId?: number): Promise<BookOperationResult> {
+  async createFromUrl(url: string, libraryId?: number): Promise<Book> {
     try {
       const ean = await this.scraper.getEanFromUrl(url)
       return await this.createBookFromEan(ean, libraryId)

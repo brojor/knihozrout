@@ -14,7 +14,7 @@ export interface Book {
   createdAt: string
   updatedAt: string | null
 
-  authors?: Author[]
+  authors: Author[]
   genres?: Genre[]
   series?: Series[]
   readingStates?: ReadingState[]

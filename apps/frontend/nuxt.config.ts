@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@pinia/nuxt', '@unocss/nuxt', '@vueuse/nuxt'],
   ssr: false,
   imports: {
-    dirs: ['types', 'repositories'],
+    dirs: ['types', 'repositories', 'errors'],
   },
   devtools: { enabled: true },
   app: {
