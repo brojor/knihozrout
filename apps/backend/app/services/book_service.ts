@@ -111,6 +111,12 @@ export class BookService {
     }
   }
 
+  async getById(id: number): Promise<Book> {
+    const book = await Book.findOrFail(id)
+
+    return await this.loadBookRelations(book)
+  }
+
   private async logFailedEanLookup(ean: number, error: string): Promise<void> {
     await FailedEanLookup.create({
       ean,

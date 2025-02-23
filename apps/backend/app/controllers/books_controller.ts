@@ -17,4 +17,12 @@ export default class BooksController {
     const book = await bookService.createFromUrl(url, libraryId)
     return response.created(book)
   }
+
+  async show({ params, response, auth }: HttpContext) {
+    const { id } = params
+    const bookService = new BookService(auth)
+
+    const book = await bookService.getById(id)
+    return response.ok(book)
+  }
 }
