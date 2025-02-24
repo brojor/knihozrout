@@ -59,7 +59,7 @@ const {
   </main>
 </template>
 
-<style>
+<style scoped>
 header {
   margin-top: clamp(
     0px, calc((100vh - 667px) * (80 / (844 - 667))), 80px);

@@ -5,3 +5,9 @@ declare global {
     handleSharedText: (sharedText: string) => void
   }
 }
+
+declare module '#app' {
+  interface PageMeta {
+    title?: string
+  }
+}
