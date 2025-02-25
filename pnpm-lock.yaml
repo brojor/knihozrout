@@ -101,6 +101,9 @@ importers:
       '@capacitor/android':
         specifier: ^7.0.1
         version: 7.0.1(@capacitor/core@7.0.1)
+      '@capacitor/app':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.0.1)
       '@capacitor/barcode-scanner':
         specifier: ^2.0.0
         version: 2.0.0(@capacitor/core@7.0.1)
@@ -592,6 +595,11 @@ packages:
     resolution: {integrity: sha512-jukJJHfkcyEBOkFBJRD3EwXMIIQo7lSv0ExPWgsIliPdGXLAj6ElvK2JaYEzec3vKyLc4RTNFVv0PMEU0vnImg==}
     peerDependencies:
       '@capacitor/core': ^7.0.0
+
+  '@capacitor/app@7.0.0':
+    resolution: {integrity: sha512-/UFwfPFsw/Jen6vjrV0lfTBOQWSaDDdmrYXKpYg4Xn8hwj0xrrRPXxC43j7VmPoj9AFMVPA+hx94ygqjChPASQ==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
 
   '@capacitor/barcode-scanner@2.0.0':
     resolution: {integrity: sha512-Qzzf4okLpYWMrrq/G6713dRzmM9APZ9hhxsz3FAUweuq/Av8Mkrh2k5rE9YnBps570gVy8fb8T5NuIjZWn8VBQ==}
@@ -7367,6 +7375,10 @@ snapshots:
       '@babel/helper-validator-identifier': 7.25.9
 
   '@capacitor/android@7.0.1(@capacitor/core@7.0.1)':
+    dependencies:
+      '@capacitor/core': 7.0.1
+
+  '@capacitor/app@7.0.0(@capacitor/core@7.0.1)':
     dependencies:
       '@capacitor/core': 7.0.1
 
