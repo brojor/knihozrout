@@ -21,7 +21,7 @@ const navigationItems = [
         <NuxtLink
           :to="item.path"
           class="h-full flex flex-col items-center justify-center decoration-none text-base-gray"
-          :class="{ 'text-primary': route.path === item.path }"
+          :class="{ 'text-blue-700': route.path === item.path }"
         >
           <div :class="item.icon" class="mb-1" />
           <span class="text-xs leading-none">{{ item.label }}</span>

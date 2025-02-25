@@ -34,4 +34,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 })
 ```
-
+[ ] fix:(FE) Při nativním android back gestu se vypne aplikace
+[X] fix:(FE) Spodní tab bar neindikuje aktuální screen
+[ ] FE: Dokončit refaktoring scanBarcode stránky
+[ ] FE: Vyřešit opětovné načítání knih při přechodu z book detailu zpátky do knihovny
