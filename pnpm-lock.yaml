@@ -110,6 +110,9 @@ importers:
       '@capacitor/haptics':
         specifier: ^7.0.0
         version: 7.0.0(@capacitor/core@7.0.1)
+      '@tanstack/vue-virtual':
+        specifier: ^3.13.1
+        version: 3.13.1(vue@3.5.13(typescript@5.7.3))
       '@unocss/reset':
         specifier: ^65.5.0
         version: 65.5.0
@@ -1744,6 +1747,14 @@ packages:
 
   '@swc/types@0.1.17':
     resolution: {integrity: sha512-V5gRru+aD8YVyCOMAjMpWR1Ui577DD5KSJsHP8RAxopAH22jFz6GZd/qxqjO6MJHQhcsjvjOFXyDhyLQUnMveQ==}
+
+  '@tanstack/virtual-core@3.13.1':
+    resolution: {integrity: sha512-C+8uwGCZEklm9+SeSXTkhCuX0chIyYZG21OnxyiHQdeAxQBKmht4q0pES0BUGoLwhmzdo04aI3IhGSMbA5cfYQ==}
+
+  '@tanstack/vue-virtual@3.13.1':
+    resolution: {integrity: sha512-gWKzQqtLIBpV62RtEEPRFrrAJdV86Y744hRFkDgzYfe3SyfcEGy6C2fSc831XyNEo/301M3OxxbpXheqs9vUPQ==}
+    peerDependencies:
+      vue: ^2.7.0 || ^3.0.0
 
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
@@ -8652,6 +8663,13 @@ snapshots:
   '@swc/types@0.1.17':
     dependencies:
       '@swc/counter': 0.1.3
+
+  '@tanstack/virtual-core@3.13.1': {}
+
+  '@tanstack/vue-virtual@3.13.1(vue@3.5.13(typescript@5.7.3))':
+    dependencies:
+      '@tanstack/virtual-core': 3.13.1
+      vue: 3.5.13(typescript@5.7.3)
 
   '@tokenizer/token@0.3.0': {}
 

@@ -18,4 +18,10 @@ export class BookRepository extends BaseRepository {
       method: 'GET',
     })
   }
+
+  async fetchBooks(): Promise<Book[]> {
+    return this.call<Book[]>('/api/books', {
+      method: 'GET',
+    })
+  }
 }

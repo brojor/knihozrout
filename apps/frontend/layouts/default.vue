@@ -1,9 +1,11 @@
 <template>
-  <div class="min-h-[100dvh] flex flex-col">
-    <div class="flex-1 p-4 flex">
+  <div class="h-[100dvh] flex flex-col">
+    <div class="flex-grow overflow-auto">
       <slot />
     </div>
-    <BottomNavBar />
+    <div class="flex-shrink-0">
+      <BottomNavBar />
+    </div>
   </div>
 </template>
 

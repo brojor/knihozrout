@@ -140,4 +140,19 @@ export class BookService {
     await book.load('readingStates')
     return book
   }
+
+  async getUserBooks(): Promise<Book[]> {
+    const user = this.auth.user!
+
+    const books = await Book.query()
+      .whereHas('libraries', (query) => {
+        query.where('user_id', user.id)
+      })
+      .preload('authors')
+      .preload('libraries')
+      .preload('bookStatuses')
+      .preload('readingStates')
+
+    return books
+  }
 }

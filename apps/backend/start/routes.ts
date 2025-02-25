@@ -31,6 +31,7 @@ router
     router.post('/books/from-ean', '#controllers/books_controller.storeFromEan')
     router.post('/books/from-url', '#controllers/books_controller.storeFromUrl')
     router.get('/books/:id', '#controllers/books_controller.show')
+    router.get('/books', '#controllers/books_controller.index')
   })
   .prefix('/api')
   .use(middleware.auth())

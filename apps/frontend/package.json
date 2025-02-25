@@ -19,6 +19,7 @@
     "@capacitor/barcode-scanner": "^2.0.0",
     "@capacitor/core": "^7.0.1",
     "@capacitor/haptics": "^7.0.0",
+    "@tanstack/vue-virtual": "^3.13.1",
     "@unocss/reset": "^65.5.0",
     "@vueuse/nuxt": "12.7.0",
     "nuxt": "^3.15.4",

@@ -25,4 +25,10 @@ export default class BooksController {
     const book = await bookService.getById(id)
     return response.ok(book)
   }
+
+  async index({ auth, response }: HttpContext) {
+    const bookService = new BookService(auth)
+    const books = await bookService.getUserBooks()
+    return response.ok(books)
+  }
 }
