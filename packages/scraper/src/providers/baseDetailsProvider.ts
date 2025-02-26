@@ -12,6 +12,7 @@ export abstract class BaseDetailsProvider {
    * @returns Částečná data o knize - provider nemusí být schopen získat všechna data
    */
   async scrapeBookDetails(url: string, ean: number): Promise<PartialScrapedBook> {
+    console.log(`Scraping ${url} for EAN: ${ean}`)
     const response = await fetch(url)
     if (!response.ok) {
       throw new DetailsProviderError(`Failed to fetch ${url}: ${response.status} - ${response.statusText}`)

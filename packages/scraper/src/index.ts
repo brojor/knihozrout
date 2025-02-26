@@ -84,24 +84,31 @@ export class BookScraper {
 
   private async scrapeFromUrls(urls: string[], ean: number): Promise<ScrapedBook> {
     let mergedBook: PartialScrapedBook = {}
-    const usedProviders = new Set<string>()
 
-    for (const url of urls) {
+    // Vytvoříme pole promises pro paralelní zpracování
+    const scrapePromises = urls.map(async (url) => {
       const domain = new URL(url).hostname.replace('www.', '')
       const provider = this.detailsProviders.find(p => p.domain === domain)
       
-      if (!provider || usedProviders.has(provider.domain)) continue
+      if (!provider) {
+        return null
+      }
 
-      const bookData = await provider.scrapeBookDetails(url, ean)
-      
-      if (Object.keys(bookData).length > 0) {
-        usedProviders.add(provider.domain)
-        mergedBook = {
-          ...mergedBook,
-          ...Object.fromEntries(
-            Object.entries(bookData).filter(([_, value]) => value !== undefined)
-          ),
-        }
+      return provider.scrapeBookDetails(url, ean)
+    })
+
+    // Počkáme na dokončení všech požadavků
+    const results = await Promise.all(scrapePromises)
+
+    // Spojíme výsledky
+    for (const bookData of results) {
+      if (!bookData || Object.keys(bookData).length === 0) continue
+
+      mergedBook = {
+        ...mergedBook,
+        ...Object.fromEntries(
+          Object.entries(bookData).filter(([_, value]) => value !== undefined)
+        ),
       }
 
       if (BookValidator.isComplete(mergedBook)) break
